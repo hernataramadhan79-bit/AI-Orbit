@@ -1,3 +1,12 @@
+---
+title: AI Orbit Backend
+emoji: 🌌
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+pinned: false
+---
+
 # 🌌 AI-Orbit - Intelligence System
 
 AI-Orbit adalah platform asisten kecerdasan buatan (AI) generasi berikutnya yang dirancang dengan estetika premium dan fitur mutakhir. Platform ini menggabungkan berbagai model AI terbaik di dunia ke dalam satu antarmuka yang elegan dan responsif.

@@ -15,11 +15,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements dan instal dependensi Python
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy seluruh kode backend
-COPY . .
+COPY backend/ .
 
 # Buat folder dummy untuk uploads dan data agar tidak error saat start
 RUN mkdir -p uploads data
