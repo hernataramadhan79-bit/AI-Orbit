@@ -5,7 +5,9 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '')}/api/:path*`,
+        // BACKEND_URL (tanpa NEXT_PUBLIC_) dibaca saat runtime oleh Next.js server
+        // JANGAN pakai NEXT_PUBLIC_ untuk backend URL karena ia di-bake saat build time
+        destination: `${(process.env.BACKEND_URL || 'http://localhost:8000').replace(/\/$/, '')}/api/:path*`,
       },
     ];
   },
