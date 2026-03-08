@@ -13,9 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI-Orbit",
-
-  description: "Premium AI Intelligence Orchestrator",
+  title: "AI-Orbit | Premium Intelligence Orchestrator",
+  description: "Asisten AI cerdas (AI-Orbit) dengan kemampuan routing model terbaik (GPT, Qwen, Llama). Akses kecerdasan buatan elit dalam satu platform premium.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 import AuthProvider from "@/components/auth/AuthProvider";
