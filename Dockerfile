@@ -28,5 +28,5 @@ RUN mkdir -p uploads data
 EXPOSE 7860
 
 # Jalankan server menggunakan uvicorn
-# Note: Hugging Face akan memberikan port dinamis, jadi kita gunakan 7860 sebagai default
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
+# --timeout-keep-alive 120: penting agar SSE stream tidak di-drop di HuggingFace
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860", "--timeout-keep-alive", "120", "--log-level", "info"]

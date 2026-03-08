@@ -15,6 +15,7 @@ async def chat_stream_endpoint(request: ChatRequest, user: dict = Depends(get_op
     Mendukung identitas user secara opsional.
     """
     # Mengembalikan response streaming tipe text/event-stream
+    # Header X-Accel-Buffering: no WAJIB untuk menonaktifkan nginx buffering di Hugging Face
     return StreamingResponse(
         run_langgraph_stream(
             request.prompt, 
@@ -23,7 +24,12 @@ async def chat_stream_endpoint(request: ChatRequest, user: dict = Depends(get_op
             request.attachments, 
             session_id=request.session_id or "default"
         ), 
-        media_type="text/event-stream"
+        media_type="text/event-stream",
+        headers={
+            "X-Accel-Buffering": "no",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        }
     )
 
 
