@@ -3,6 +3,7 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 pyjwt
+passlib[bcrypt]
 python-dotenv
 openai
 httpx
