@@ -1,0 +1,32 @@
+# Gunakan Python image resmi yang ringan
+FROM python:3.10-slim
+
+# Set environment variables agar output log bersih
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Buat folder kerja
+WORKDIR /app
+
+# Instal dependensi sistem yang diperlukan untuk ChromaDB dan pengolahan gambar
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements dan instal dependensi Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy seluruh kode backend
+COPY . .
+
+# Buat folder dummy untuk uploads dan data agar tidak error saat start
+RUN mkdir -p uploads data
+
+# Ekspos port (Hugging Face biasanya menggunakan port 7860 secara default)
+EXPOSE 7860
+
+# Jalankan server menggunakan uvicorn
+# Note: Hugging Face akan memberikan port dinamis, jadi kita gunakan 7860 sebagai default
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
