@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, Loader2, Sparkles, Chrome } from 'lucide-react';
 
-import { supabase, isSupabaseEnabled } from '../../lib/supabase';
+import { supabase, isSupabaseEnabled } from '@/lib/supabase';
 import { useThemeStore } from '../../store/useThemeStore';
 
 interface AuthModalProps {

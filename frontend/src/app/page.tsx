@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useThemeStore } from '../store/useThemeStore';
 import { useAuthStore } from '../store/useAuthStore';
 import AuthModal from '../components/auth/AuthModal';
-import { supabase, isSupabaseEnabled } from '../lib/supabase';
+import { supabase, isSupabaseEnabled } from '@/lib/supabase';
 
 
 // Fallback UUID generator if crypto.randomUUID is unavailable

@@ -7,12 +7,12 @@ import { Send, Square, Paperclip, Image as ImageIcon, Mic, ChevronDown, Sparkles
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { supabase, isSupabaseEnabled } from '../../lib/supabase';
+import { supabase, isSupabaseEnabled } from '@/lib/supabase';
 
 import { useThemeStore } from '../../store/useThemeStore';
 import ArtifactPanel, { Artifact } from './ArtifactPanel';
 import VoicePlayer from './VoicePlayer';
-import { useAuthStore } from '../../store/useAuthStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface ChatBoxProps {
     isSidebarOpen: boolean;

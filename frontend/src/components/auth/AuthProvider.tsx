@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { supabase, isSupabaseEnabled } from '../../lib/supabase';
+import { supabase, isSupabaseEnabled } from '@/lib/supabase';
 import { useAuthStore } from '../../store/useAuthStore';
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
