@@ -66,8 +66,7 @@ export default function Home() {
           const { data: convs, error } = await supabase
             .from('conversations')
             .select(`
-              id, title, model, is_pinned,
-              messages (role, content, attachments)
+              id, title, model, is_pinned, updated_at
             `)
             .eq('user_id', user.id)
             .order('updated_at', { ascending: false });
@@ -79,30 +78,25 @@ export default function Home() {
               id: c.id,
               title: c.title,
               pinned: c.is_pinned,
-              messages: c.messages
+              messages: []
             }));
 
             // --- SMART MERGE: Prevent data loss and duplication ---
             const historyMap = new Map();
-
-            // Start with Cloud data
             cloudHistory.forEach(item => historyMap.set(item.id, item));
 
-            // Merge Local data: If local has it and it's newer/different, you might prefer local
-            // but for simplicity, we favor Cloud for consistency, UNLESS it's the active session.
             combinedHistory.forEach((item: any) => {
               if (item.id === activeSessionId) {
-                // Keep active session local state as primary truth to avoid flickering/looping
                 historyMap.set(item.id, item);
-              } else if (!historyMap.has(item.id)) {
-                // If cloud doesn't have it yet (newly created), keep local
+              } else if (historyMap.has(item.id)) {
+                const cloudItem = historyMap.get(item.id);
+                historyMap.set(item.id, { ...cloudItem, messages: item.messages || [] });
+              } else {
                 historyMap.set(item.id, item);
               }
             });
 
             combinedHistory = Array.from(historyMap.values());
-
-            // Sync resolved history back to local to keep things in sync
             localStorage.setItem('ai-orbit-history', JSON.stringify(combinedHistory));
           }
         } catch (err) {
