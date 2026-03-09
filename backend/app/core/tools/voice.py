@@ -1,8 +1,8 @@
-"""
-ElevenLabs Text-to-Speech integration.
-"""
+import httpx
 from typing import AsyncGenerator, Optional
+import logging
 
+logger = logging.getLogger(__name__)
 
 class VoiceTool:
     """Menghasilkan suara dari teks menggunakan ElevenLabs API."""
@@ -22,9 +22,8 @@ class VoiceTool:
     async def synthesize(self, text: str, voice_id: Optional[str] = None) -> Optional[bytes]:
         """Convert text to speech. Return audio bytes or None."""
         if not self._available:
+            logger.warning("VoiceTool: Attempted to synthesize but tool is not available (check API Key)")
             return None
-        
-        import httpx
         
         vid = voice_id or self.default_voice_id
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{vid}"
@@ -49,10 +48,14 @@ class VoiceTool:
                 if response.status_code == 200:
                     return response.content
                 else:
-                    print(f"ElevenLabs error: {response.status_code} - {response.text[:200]}")
+                    error_msg = f"ElevenLabs API Error: {response.status_code} - {response.text[:200]}"
+                    logger.error(error_msg)
+                    # Kita juga print agar muncul di console log deployment (Render/HF)
+                    print(error_msg)
                     return None
         except Exception as e:
-            print(f"Voice synthesis error: {e}")
+            logger.error(f"Voice synthesis exception: {e}")
+            print(f"Voice synthesis exception: {e}")
             return None
 
 
