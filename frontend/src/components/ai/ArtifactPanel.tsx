@@ -132,8 +132,7 @@ export default function ArtifactPanel({ artifact, onClose }: ArtifactPanelProps)
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 40 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                    className="flex flex-col h-full bg-[#111111] border-l border-white/5 overflow-hidden"
-                    style={{ minWidth: '380px' }}
+                    className="fixed inset-0 lg:relative lg:inset-auto h-full bg-[#111111] lg:border-l border-white/5 overflow-hidden z-[100] lg:z-auto w-full lg:w-[450px] lg:min-w-[450px]"
                 >
                     {/* Header */}
                     <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">

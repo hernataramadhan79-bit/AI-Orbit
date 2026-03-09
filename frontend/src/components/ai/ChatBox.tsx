@@ -562,7 +562,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
     return (
         <div className="flex h-full bg-transparent overflow-hidden relative">
             {/* Main Chat Column */}
-            <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative">
+            <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative max-h-full">
                 <header className="absolute top-2 md:top-4 left-0 w-full h-12 md:h-16 flex items-center px-4 md:px-8 bg-transparent z-40 pointer-events-none">
                     <div className="flex items-center justify-between w-full pointer-events-auto">
                         <div className="flex items-center gap-2 md:gap-3">
@@ -615,7 +615,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                     </div>
                 </header>
 
-                <div className="flex-1 overflow-y-auto w-full scroll-smooth custom-scrollbar" ref={chatContainerRef}>
+                <div className="flex-1 overflow-y-auto w-full scroll-smooth custom-scrollbar min-h-0 overscroll-contain" ref={chatContainerRef}>
                     <AnimatePresence mode="wait">
                         {messages.length === 0 ? (
                             <motion.div
@@ -712,7 +712,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                     </AnimatePresence>
                 </div>
 
-                <div className="shrink-0 pb-3 md:pb-6 pt-2 px-3 md:px-6 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f] to-transparent z-20">
+                <div className="shrink-0 pb-[env(safe-area-inset-bottom,12px)] md:pb-6 pt-2 px-3 md:px-6 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f] to-transparent z-20">
                     <div className="max-w-6xl mx-auto relative md:px-4">
                         <AnimatePresence>
                             {attachments.length > 0 && (
