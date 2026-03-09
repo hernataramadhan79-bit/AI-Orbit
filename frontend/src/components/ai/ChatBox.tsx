@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useChatStream } from '../../hooks/useChatStream';
 import { useAgentStore } from '../../store/useAgentStore';
-import { Send, Square, Paperclip, Image as ImageIcon, Mic, ChevronDown, Sparkles, Globe, Activity, PanelLeft, User, Copy, Check, Pencil, Orbit, Code, RotateCcw } from 'lucide-react';
+import { Send, Square, Paperclip, Image as ImageIcon, Mic, ChevronDown, Sparkles, Globe, Activity, PanelLeft, User, Copy, Check, Pencil, Orbit, Code, RotateCcw, Layout } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -85,7 +85,7 @@ const MessageItem = React.memo(({
 
                 {/* Message Actions */}
                 {!isEditing && (!isStreaming || msg.content?.length > 0) && (
-                    <div className={`flex items-center gap-1 mt-2 transition-opacity duration-300 ${msg.role === 'user' ? 'justify-end opacity-100 md:opacity-0 group-hover/msg:opacity-100' : 'opacity-100 md:opacity-0 group-hover/msg:opacity-100'}`}>
+                    <div className={`flex items-center gap-1 mt-2 transition-opacity duration-300 ${msg.role === 'user' ? 'justify-end opacity-100' : 'opacity-100'}`}>
                         <button onClick={() => onCopy(msg.content, i)} className="p-1.5 md:p-2 hover:bg-white/5 rounded-lg text-gray-500 hover:text-gray-300 transition-colors" title="Salin">
                             {copiedId === i ? <Check className="w-3 h-3 md:w-3.5 md:h-3.5" /> : <Copy className="w-3 h-3 md:w-3.5 md:h-3.5" />}
                         </button>
@@ -99,16 +99,18 @@ const MessageItem = React.memo(({
                         ) : (
                             <>
                                 <VoicePlayer text={msg.content} messageId={i} />
-                                <button
-                                    onClick={() => {
-                                        const artifact = extractArtifact(msg.content, i);
-                                        if (artifact) setCurrentArtifact(artifact);
-                                    }}
-                                    className={`p-1.5 md:p-2 hover:bg-white/5 rounded-lg transition-colors ${extractArtifact(msg.content, i) ? 'text-blue-400' : 'text-gray-500 hover:text-gray-300'}`}
-                                    title="Tampilkan Preview"
-                                >
-                                    <Globe className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                                </button>
+                                {extractArtifact(msg.content, i) && (
+                                    <button
+                                        onClick={() => {
+                                            const artifact = extractArtifact(msg.content, i);
+                                            if (artifact) setCurrentArtifact(artifact);
+                                        }}
+                                        className="p-1.5 md:p-2 hover:bg-white/5 rounded-lg transition-all text-blue-400"
+                                        title="Buka Panel Preview"
+                                    >
+                                        <Layout className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                                    </button>
+                                )}
                                 {isLast && (
                                     <button onClick={onRegenerate} className="p-1.5 md:p-2 hover:bg-white/5 rounded-lg text-gray-500 hover:text-gray-300 transition-colors" title="Regenerasi">
                                         <RotateCcw className="w-3 h-3 md:w-3.5 md:h-3.5" />
