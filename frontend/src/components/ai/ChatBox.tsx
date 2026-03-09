@@ -45,7 +45,7 @@ const MessageItem = React.memo(({
                 </div>
             )}
             <div className={`relative min-w-0 max-w-[92%] sm:max-w-[85%] md:max-w-[75%] ${msg.role === 'user' ? '' : 'flex-1'}`}>
-                <div className={`text-[14px] md:text-[15px] leading-relaxed relative ${msg.role === 'user' ? 'bg-[#2a2a2a] text-gray-100 px-3 md:px-6 py-2 md:py-4 rounded-[1.25rem] md:rounded-[2rem] rounded-tr-sm shadow-xl border border-white/5' : 'text-gray-200 py-1.5 md:py-2.5'}`}>
+                <div className={`text-[14px] md:text-[15px] leading-relaxed relative ${msg.role === 'user' ? 'bg-[#262626] text-gray-100 px-4 md:px-7 py-2.5 md:py-4 rounded-2xl md:rounded-[2rem] rounded-tr-none shadow-2xl border border-white/5' : 'text-gray-200 py-1.5 md:py-2.5'}`}>
                     {isEditing ? (
                         <div className="flex flex-col gap-3">
                             <textarea
@@ -59,7 +59,7 @@ const MessageItem = React.memo(({
                             </div>
                         </div>
                     ) : (
-                        <div className="prose-ai max-w-none">
+                        <div className={`${msg.role === 'ai' ? 'prose-ai' : ''} max-w-none`}>
                             {(!msg.content || msg.content.trim() === "") && isStreaming ? (
                                 <div className="flex items-center gap-2 h-6 md:h-7">
                                     <div className="flex items-center gap-1.5">
