@@ -35,7 +35,7 @@ const MessageItem = React.memo(({
             className={`flex gap-3 md:gap-5 group/msg ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
         >
             {msg.role === 'ai' && (
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl p-[1px] flex-shrink-0 mt-1 shadow-lg overflow-hidden group/avatar" style={{ background: `linear-gradient(to top right, ${primaryColor}88, transparent)` }}>
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl p-[1px] flex-shrink-0 shadow-lg overflow-hidden group/avatar" style={{ background: `linear-gradient(to top right, ${primaryColor}88, transparent)` }}>
                     <div className="w-full h-full rounded-xl md:rounded-2xl bg-[#0f0f0f] flex items-center justify-center">
                         <Orbit
                             className={`w-4 h-4 md:w-5 md:h-5 transition-transform duration-700 ${isStreaming ? 'animate-spin' : 'group-hover/avatar:rotate-180'}`}
@@ -45,7 +45,7 @@ const MessageItem = React.memo(({
                 </div>
             )}
             <div className={`relative min-w-0 max-w-[92%] sm:max-w-[85%] md:max-w-[75%] ${msg.role === 'user' ? '' : 'flex-1'}`}>
-                <div className={`text-[14px] md:text-[15px] leading-relaxed relative ${msg.role === 'user' ? 'bg-[#2a2a2a] text-gray-100 px-3 md:px-6 py-2 md:py-4 rounded-[1.25rem] md:rounded-[2rem] rounded-tr-sm shadow-xl border border-white/5' : 'text-gray-200 py-1 md:py-2'}`}>
+                <div className={`text-[14px] md:text-[15px] leading-relaxed relative ${msg.role === 'user' ? 'bg-[#2a2a2a] text-gray-100 px-3 md:px-6 py-2 md:py-4 rounded-[1.25rem] md:rounded-[2rem] rounded-tr-sm shadow-xl border border-white/5' : 'text-gray-200 py-1.5 md:py-2.5'}`}>
                     {isEditing ? (
                         <div className="flex flex-col gap-3">
                             <textarea
@@ -61,10 +61,12 @@ const MessageItem = React.memo(({
                     ) : (
                         <div className="prose-ai max-w-none">
                             {(!msg.content || msg.content.trim() === "") && isStreaming ? (
-                                <div className="flex items-center gap-1.5 py-2">
-                                    <motion.div animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0 }} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryColor }} />
-                                    <motion.div animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryColor }} />
-                                    <motion.div animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryColor }} />
+                                <div className="flex items-center gap-2 h-6 md:h-7">
+                                    <div className="flex items-center gap-1.5">
+                                        <motion.div animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0 }} className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" style={{ backgroundColor: primaryColor }} />
+                                        <motion.div animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" style={{ backgroundColor: primaryColor }} />
+                                        <motion.div animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" style={{ backgroundColor: primaryColor }} />
+                                    </div>
                                 </div>
                             ) : (
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
