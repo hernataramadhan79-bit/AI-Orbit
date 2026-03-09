@@ -511,13 +511,51 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
         }
     };
 
+    // High-Fidelity Brand Logos
+    const BrandLogos = {
+        meta: (className: string) => (
+            <svg viewBox="0 0 24 24" className={className}>
+                <defs>
+                    <linearGradient id="metaGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" style={{ stopColor: '#0668E1' }} />
+                        <stop offset="100%" style={{ stopColor: '#00F2FE' }} />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#metaGradient)" d="M16.145 5.564c-1.125 0-2.315.657-3.23 1.777l-.915 1.115-.915-1.115c-.915-1.12-2.105-1.777-3.23-1.777-2.396 0-4.339 2.016-4.339 4.499 0 1.25.496 2.385 1.3 3.197.643.648 1.487 1.018 2.4 1.056l.639.027 1.112-1.355.8a.987.987 0 0 1 1.528 0l.8 1.355 1.112 1.355.639-.027c.913-.038 1.757-.408 2.4-1.056.804-.812 1.3-1.947 1.3-3.197 0-2.483-1.943-4.499-4.339-4.499zm-6.23 7.222l-.123-.005a2.028 2.028 0 0 1-1.328-.592 2.05 2.05 0 0 1-.58-.124c-.053-.02-.103-.044-.15-.072a2.02 2.02 0 0 1-.363-3.486c.047-.03.11-.06.182-.09.351-.115.772-.181 1.218-.181.71 0 1.442.41 2.008 1.077l.79.94-.79.939c-.198.232-.486.536-.844.795zm6.353-.597a2.028 2.028 0 0 1-1.328.592l-.123.005c-.358-.259-.646-.563-.844-.795l-.79-.939.79-.94c.566-.667 1.298-1.077 2.008-1.077.446 0 .867.066 1.218.181.072.03.135.06.182.09a2.02 2.02 0 0 1-.363 3.486c-.047.028-.097.052-.15.072a2.05 2.05 0 0 1-.58.124z" />
+            </svg>
+        ),
+        openai: (className: string) => (
+            <svg viewBox="0 0 24 24" className={className} fill="#10A37F">
+                <path d="M22.282 11.976a4.43 4.43 0 0 0-.411-2.13 4.475 4.475 0 0 0-1.859-1.983c.046-.247.065-.499.056-.753-.01-.588-.173-1.16-.472-1.658a4.417 4.417 0 0 0-1.503-1.503 4.54 4.54 0 0 0-3.32-.472c-.247-.046-.499-.065-.753-.056a4.415 4.415 0 0 0-1.658.472 4.417 4.417 0 0 0-1.503 1.503 4.433 4.433 0 0 0-.411 2.13 4.476 4.476 0 0 0-1.841 1.983c-.046-.247-.066-.499-.056-.753.01-.588.173-1.16.471-1.658a4.417 4.417 0 0 0 1.503-1.503 4.54 4.54 0 0 0 3.321-.472c.247-.046.499-.065.753-.056.588.01 1.16.173 1.658.471a4.417 4.417 0 0 0 1.503 1.503 4.43 4.43 0 0 0 .411 2.13c-.046.247-.065.499-.056.753.011.588.173-1.16.472 1.658a4.417 4.417 0 0 0 1.503 1.503 4.54 4.54 0 0 0 3.32-.472c.247.045.499.065.753.056.588-.011 1.16-.174 1.658-.472a4.417 4.417 0 0 0 1.503-1.503c.298-.497.461-1.069.471-1.658a4.54 4.54 0 0 0-.056-.753zm-11.233-6.505a2.536 2.536 0 0 1 1.597-.132c.164.045.318.12.451.222l.142.11 2.115 3.664a.276.276 0 0 1-.093.385l-4.421 2.553a.276.276 0 0 1-.385-.093l-2.115-3.664a2.49 2.49 0 0 1-.225-1.198 2.527 2.527 0 0 1 1.198-2.115c.132-.077.279-.133.43-.166zm-4.782 5.394c.045-.164.12-.319.223-.451l.11-.142 2.115-3.664a.276.276 0 0 1 .385-.093l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664a2.49 2.49 0 0 1-1.198.225 2.53 2.53 0 0 1-2.115-1.198 2.536 2.536 0 0 1-.132-1.597.276.276 0 0 1 .223-.451zM6.438 18.53a2.536 2.536 0 0 1-1.597.132 2.54 2.54 0 0 1-1.198-2.115 2.49 2.49 0 0 1 .225-1.198l2.115-3.664a.276.276 0 0 1 .385-.093l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664c-.133.23-.318.431-.542.59a2.527 2.527 0 0 1-1.934.41l.132-1.597a.276.276 0 0 1-.091-.453zm6.505 1.702a2.536 2.536 0 0 1-1.597.132 2.527 2.527 0 0 1-1.649-2.337l-.011-4.231a.276.276 0 0 1 .276-.276l5.106.014a.276.276 0 0 1 .276.276v4.23c-.001.265-.054.527-.156.772a2.53 2.53 0 0 1-2.455 1.636l.21.014zm4.782-5.394c-.045.164-.12.319-.222.451l-.11.142-2.115 3.664a.276.276 0 0 1-.385.093l-4.421-2.553a.276.276 0 0 1-.093-.385l2.115-3.664a2.49 2.49 0 0 1 1.198-.225 2.53 2.53 0 0 1 2.115 1.198c.077.132.133.279.166.43l-.11.451zm1.313-1.832c-.133.076-.279.133-.43.166a.276.276 0 0 1-.223.451h-.001a1.26 1.26 0 0 1-1.597-.132 2.536 2.536 0 0 1-.542-.591 2.27 2.27 0 0 1-.413-.771 2.54 2.54 0 0 1 .411-1.936l2.115-3.664a.276.276 0 0 1 .385-.094l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664c-.133.23-.318.431-.542.59z" />
+            </svg>
+        ),
+        deepseek: (className: string) => (
+            <svg viewBox="0 0 1024 1024" className={className}>
+                <path fill="#4D6BFE" d="M512 0C229.2 0 0 229.2 0 512s229.2 512 512 512 512-229.2 512-512S794.8 0 512 0zm0 832c-176.7 0-320-143.3-320-320S335.3 192 512 192s320 143.3 320 320-143.3 320-320 320z" />
+                <path fill="#4D6BFE" d="M512 288c-123.7 0-224 100.3-224 224s100.3 224 224 224 224-100.3 224-224-100.3-224-224-224zm0 352c-70.7 0-128-57.3-128-128s57.3-128 128-128 128 57.3 128 128-57.3 128-128 128z" />
+            </svg>
+        ),
+        kimi: (className: string) => (
+            <svg viewBox="0 0 24 24" className={className} fill="#FF5C00">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.455 12.545c0 2.408-1.956 4.364-4.364 4.364s-4.364-1.956-4.364-4.364 1.956-4.364 4.364-4.364 4.364 1.956 4.364 4.364z" />
+                <path d="M12 8.727c-1.806 0-3.273 1.467-3.273 3.273s1.467 3.273 3.273 3.273 3.273-1.467 3.273-3.273-1.467-3.273-3.273-3.273zm1.091 4.364h-2.182v-2.182h2.182v2.182z" />
+            </svg>
+        ),
+        qwen: (className: string) => (
+            <svg viewBox="0 0 24 24" className={className} fill="#8A2BE2">
+                <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zm0 18.545c-3.609 0-6.545-2.936-6.545-6.545S8.391 5.455 12 5.455s6.545 2.936 6.545 6.545-2.936 6.545-6.545 6.545z" />
+                <path d="M12 8.727c-1.806 0-3.273 1.467-3.273 3.273s1.467 3.273 3.273 3.273 3.273-1.467 3.273-3.273-1.467-3.273-3.273-3.273zm0 4.364c-.603 0-1.091-.488-1.091-1.091s.488-1.091 1.091-1.091 1.091.488 1.091 1.091-.488 1.091-1.091 1.091z" />
+            </svg>
+        )
+    };
+
     const agents = [
-        { id: 'auto', name: 'Auto / Orbit Brain', icon: <Sparkles className="w-4 h-4" /> },
-        { id: 'llama', name: 'Meta / Llama 3.3-70b', icon: <Activity className="w-4 h-4" /> },
-        { id: 'deepseek', name: 'DeepSeek / deepseek-v3.2', icon: <Sparkles className="w-4 h-4" /> },
-        { id: 'qwen', name: 'Alibaba / Qwen 3 Next', icon: <Sparkles className="w-4 h-4" /> },
-        { id: 'kimi', name: 'Moonshot / Kimi K2.5', icon: <Orbit className="w-4 h-4" /> },
-        { id: 'gpt', name: 'OpenAI / gpt-oss-120b', icon: <Globe className="w-4 h-4" /> }
+        { id: 'auto', name: 'Auto / Orbit Brain', icon: <Orbit className="w-6 h-6" style={{ color: primaryColor }} />, desc: 'Cepat & Seimbang' },
+        { id: 'llama', name: 'Meta / Llama 3.3-70b', icon: BrandLogos.meta("w-6 h-6"), desc: 'Logika & Akurasi' },
+        { id: 'deepseek', name: 'DeepSeek / DeepSeek-V3', icon: BrandLogos.deepseek("w-6 h-6"), desc: 'Coding & Analitik' },
+        { id: 'qwen', name: 'Alibaba / Qwen 2.5 Next', icon: BrandLogos.qwen("w-6 h-6"), desc: 'Kreatif & Penulisan' },
+        { id: 'kimi', name: 'Moonshot / Kimi K2.5', icon: BrandLogos.kimi("w-6 h-6"), desc: 'File & Memori Panjang' },
+        { id: 'gpt', name: 'OpenAI / GPT-4o-Latest', icon: BrandLogos.openai("w-6 h-6"), desc: 'Performa Terbaik' }
     ];
 
 
@@ -708,7 +746,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
 
                             <form
                                 onSubmit={handleSend}
-                                className="relative flex items-center bg-[#141414]/95 backdrop-blur-3xl rounded-[2rem] border border-white/10 shadow-2xl focus-within:bg-[#181818] focus-within:border-white/20 transition-all duration-400 pl-2 md:pl-3 pr-2 md:pr-3 py-1.5 md:py-2.5 min-h-[58px] md:min-h-[68px]"
+                                className="relative flex items-center gap-2 bg-[#141414]/95 backdrop-blur-3xl rounded-[2rem] border border-white/10 shadow-2xl focus-within:bg-[#181818] focus-within:border-white/20 transition-all duration-400 pl-3 md:pl-4 pr-3 md:pr-4 py-1.5 md:py-2.5 min-h-[56px] md:min-h-[68px]"
                             >
                                 <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => handleFileUpload(e, 'file')} />
                                 <input type="file" accept="image/*" ref={imageInputRef} className="hidden" onChange={(e) => handleFileUpload(e, 'image')} />
@@ -718,13 +756,12 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                     <button
                                         type="button"
                                         onClick={() => setDropdownOpen(!dropdownOpen)}
-                                        className="flex items-center gap-2 px-3 md:px-4 h-11 rounded-2xl transition-all text-xs font-bold text-gray-400 hover:text-white group border border-white/5 bg-white/[0.03] hover:bg-white/[0.08]"
+                                        className="flex items-center gap-2 px-3 md:px-4 h-9 md:h-11 rounded-xl md:rounded-2xl transition-all text-xs font-bold text-gray-400 hover:text-white group border border-white/5 bg-white/[0.03] hover:bg-white/[0.08]"
                                     >
-                                        <div className="relative flex items-center justify-center">
-                                            <div className="absolute inset-0 blur-md rounded-full animate-pulse opacity-40 transition-colors" style={{ backgroundColor: primaryColor }} />
-                                            <Orbit className="w-4 h-4 relative z-10 group-hover:rotate-90 transition-transform duration-500" style={{ color: primaryColor }} />
+                                        <div className="relative flex items-center justify-center w-6 h-6">
+                                            {agents.find(a => a.name === selectedAgent)?.icon}
                                         </div>
-                                        <span className="hidden lg:inline tracking-tight">{selectedAgent.split(' / ')[1]}</span>
+                                        <span className="hidden md:inline tracking-tight">{selectedAgent.split(' / ')[1]}</span>
                                         <ChevronDown className={`w-3.5 h-3.5 opacity-50 hidden md:inline transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
                                     </button>
 
@@ -734,7 +771,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                                 initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                                 animate={{ opacity: 1, scale: 1, y: -4 }}
                                                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                                className="absolute bottom-full left-0 mb-4 w-60 md:w-64 bg-[#1a1a1a] border border-white/10 rounded-[24px] shadow-2xl py-3 z-[110] overflow-hidden backdrop-blur-3xl"
+                                                className="absolute bottom-full left-0 mb-4 w-72 md:w-80 bg-[#141414] border border-white/10 rounded-[28px] shadow-2xl py-3 z-[110] overflow-hidden backdrop-blur-3xl"
                                             >
                                                 <div className="px-5 pb-2 mb-2 border-b border-white/5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Pilih Intelligence</div>
                                                 {agents.map((ag) => {
@@ -743,19 +780,19 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                                         <button
                                                             key={ag.name}
                                                             onClick={() => { setSelectedAgent(ag.name); setDropdownOpen(false); }}
-                                                            className={`w-full text-left px-5 py-3 flex items-center gap-4 transition-all text-sm group relative ${isActive ? 'text-white' : 'hover:bg-white/5 text-gray-300 hover:text-white'
+                                                            className={`w-full text-left px-5 py-3.5 flex items-center gap-4 transition-all group relative ${isActive ? 'text-white' : 'hover:bg-white/5 text-gray-300 hover:text-white'
                                                                 }`}
-                                                            style={isActive ? { backgroundColor: `${primaryColor}1a`, color: primaryColor } : {}}
+                                                            style={isActive ? { backgroundColor: 'rgba(255,255,255,0.03)' } : {}}
                                                         >
-                                                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${isActive ? '' : 'bg-white/5 group-hover:bg-white/10'
-                                                                }`}
-                                                                style={isActive ? { backgroundColor: `${primaryColor}33`, color: primaryColor } : {}}
-                                                            >
+                                                            <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center transition-colors shrink-0 bg-black/20 border border-white/5">
                                                                 {ag.icon}
                                                             </div>
-                                                            <span className="font-semibold flex-1">{ag.name.split(' / ')[1] || ag.name}</span>
+                                                            <div className="flex flex-col min-w-0 flex-1">
+                                                                <span className="font-bold text-sm leading-none mb-1">{ag.name.split(' / ')[1] || ag.name}</span>
+                                                                <span className="text-[11px] text-gray-500 line-clamp-1 group-hover:text-gray-400 transition-colors uppercase tracking-tight">{ag.desc}</span>
+                                                            </div>
                                                             {isActive && (
-                                                                <div className="relative flex items-center justify-center mr-1">
+                                                                <div className="relative flex items-center justify-center mr-1 shrink-0">
                                                                     <div className="absolute w-2 h-2 rounded-full blur-sm animate-pulse" style={{ backgroundColor: primaryColor }} />
                                                                     <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryColor }} />
                                                                 </div>
@@ -768,13 +805,11 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                     </AnimatePresence>
                                 </div>
 
-                                <div className="w-px h-6 bg-white/10 mx-1 md:mx-2 hidden sm:block"></div>
-
                                 {/* Attachment Action */}
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="p-2.5 md:p-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all shrink-0 group"
+                                    className="p-2 md:p-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all shrink-0 group"
                                     title="Lampirkan file"
                                 >
                                     <Paperclip className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -788,13 +823,13 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                         onChange={handleInput}
                                         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(e); } }}
                                         placeholder="Tanya Sesuatu..."
-                                        className="w-full bg-transparent py-2.5 md:py-3 px-1 text-sm md:text-[16px] text-gray-100 focus:outline-none resize-none placeholder-gray-500 leading-relaxed custom-scrollbar overflow-y-auto max-h-[150px] md:max-h-[200px] min-h-[38px] md:min-h-[44px] flex items-center"
+                                        className="w-full bg-transparent py-2 md:py-3 px-1 text-sm md:text-[16px] text-gray-100 focus:outline-none resize-none placeholder-gray-500 leading-relaxed custom-scrollbar overflow-y-auto max-h-[150px] md:max-h-[200px] min-h-[36px] md:min-h-[44px] flex items-center"
                                         rows={1}
                                     />
                                 </div>
 
                                 {/* Right Actions */}
-                                <div className="flex items-center gap-1 md:gap-1.5 shrink-0 ml-1 md:ml-2">
+                                <div className="flex items-center gap-1 shrink-0">
                                     <button
                                         type="button"
                                         onClick={startVoiceInput}
@@ -808,9 +843,9 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                         <button
                                             type="button"
                                             onClick={stopStream}
-                                            className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-white bg-white/10 hover:bg-red-500/20 hover:text-red-400 rounded-2xl transition-all shadow-lg border border-white/5"
+                                            className="w-9 h-9 md:w-11 md:h-11 flex items-center justify-center text-white bg-white/10 hover:bg-red-500/20 hover:text-red-400 rounded-xl md:rounded-2xl transition-all shadow-lg border border-white/5"
                                         >
-                                            <Square className="w-4 h-4 fill-current" />
+                                            <Square className="w-3.5 h-3.5 fill-current" />
                                         </button>
                                     ) : (
                                         <motion.button
@@ -818,7 +853,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                             whileTap={(input.trim() || attachments.length > 0) ? { scale: 0.98 } : {}}
                                             type="submit"
                                             disabled={!input.trim() && attachments.length === 0}
-                                            className={`w-10 h-10 md:w-11 md:h-11 rounded-2xl transition-all duration-300 flex items-center justify-center ${(input.trim() || attachments.length > 0)
+                                            className={`w-9 h-9 md:w-11 md:h-11 rounded-xl md:rounded-2xl transition-all duration-300 flex items-center justify-center ${(input.trim() || attachments.length > 0)
                                                 ? 'shadow-xl'
                                                 : 'bg-white/[0.03] text-gray-600 cursor-not-allowed border border-white/5'
                                                 }`}
