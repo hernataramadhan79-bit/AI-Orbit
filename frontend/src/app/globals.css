@@ -35,79 +35,85 @@
 
     /* Markdown Styles for AI Responses */
     .prose-ai {
-        @apply text-gray-200 leading-relaxed;
-        --accent-glow: color-mix(in srgb, var(--primary-color), transparent 80%);
+        @apply text-gray-200 leading-relaxed text-[15px];
+        --accent-glow: color-mix(in srgb, var(--primary-color), transparent 85%);
     }
 
     .prose-ai h1 {
-        @apply text-2xl font-bold mb-4 mt-6 text-white;
+        @apply text-2xl font-black mb-6 mt-10 text-white tracking-tight;
     }
 
     .prose-ai h2 {
-        @apply text-xl font-bold mb-3 mt-5 text-white;
+        @apply text-xl font-bold mb-4 mt-8 text-white tracking-tight border-b border-white/5 pb-2;
     }
 
     .prose-ai h3 {
-        @apply text-lg font-bold mb-2 mt-4 text-white;
+        @apply text-lg font-bold mb-3 mt-6 text-white;
     }
 
     .prose-ai p {
-        @apply mb-4;
+        @apply mb-5 leading-relaxed opacity-95;
     }
 
     .prose-ai strong {
-        @apply font-bold;
-        color: var(--primary-color);
+        @apply font-bold text-white;
     }
 
     .prose-ai em {
-        @apply italic opacity-90;
-        color: var(--primary-color);
+        @apply italic opacity-90 text-inherit;
     }
 
     .prose-ai ul {
-        @apply list-disc ml-6 mb-4 space-y-2;
+        @apply list-disc ml-6 mb-6 space-y-3;
     }
 
     .prose-ai ol {
-        @apply list-decimal ml-6 mb-4 space-y-2;
+        @apply list-decimal ml-6 mb-6 space-y-3;
+    }
+
+    .prose-ai li {
+        @apply pl-1;
     }
 
     .prose-ai table {
-        @apply w-full border-collapse mb-6 overflow-hidden rounded-xl border border-white/10;
+        @apply w-full border-collapse mb-8 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02];
     }
 
     .prose-ai th {
-        @apply bg-white/5 text-left p-3 font-bold border-b border-white/10;
+        @apply bg-white/5 text-left p-4 font-bold border-b border-white/10 text-sm;
         color: var(--primary-color);
     }
 
     .prose-ai td {
-        @apply p-3 border-b border-white/5 text-gray-300;
+        @apply p-4 border-b border-white/5 text-gray-300 text-sm;
     }
 
     .prose-ai a {
-        @apply underline transition-all;
+        @apply underline transition-all font-medium;
         color: var(--primary-color);
         text-decoration-color: color-mix(in srgb, var(--primary-color), transparent 70%);
     }
 
     .prose-ai a:hover {
         text-decoration-color: var(--primary-color);
+        @apply opacity-80;
     }
 
     .prose-ai blockquote {
-        @apply border-l-4 pl-4 py-1 italic my-4 rounded-r-lg;
-        border-color: color-mix(in srgb, var(--primary-color), transparent 50%);
-        background-color: color-mix(in srgb, var(--primary-color), transparent 95%);
+        @apply border-l-4 pl-6 py-2 italic my-8 rounded-r-2xl bg-white/[0.03];
+        border-color: var(--primary-color);
     }
 
-    .prose-ai code {
-        @apply bg-white/10 px-1.5 py-0.5 rounded font-mono text-sm;
+    .prose-ai code:not(pre code) {
+        @apply bg-white/10 px-2 py-0.5 rounded-lg font-mono text-[13px] border border-white/5;
         color: var(--primary-color);
     }
 
     .prose-ai pre {
-        @apply bg-[#1a1a1a] p-4 rounded-2xl border border-white/10 overflow-x-auto my-4;
+        @apply bg-[#0a0a0a] p-5 rounded-[1.5rem] border border-white/10 overflow-x-auto my-8 shadow-2xl;
+    }
+
+    .prose-ai hr {
+        @apply border-white/10 my-10;
     }
 }

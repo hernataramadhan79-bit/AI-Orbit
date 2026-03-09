@@ -59,7 +59,7 @@ const MessageItem = React.memo(({
                             </div>
                         </div>
                     ) : (
-                        <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-black/30 prose-pre:border prose-pre:border-white/5">
+                        <div className="prose-ai max-w-none">
                             {(!msg.content || msg.content.trim() === "") && isStreaming ? (
                                 <div className="flex items-center gap-1.5 py-2">
                                     <motion.div animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0 }} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryColor }} />
