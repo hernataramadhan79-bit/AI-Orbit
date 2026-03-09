@@ -208,72 +208,69 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
         }
     }, [sessionId, initialMessages]);
 
-    // Persist messages to localStorage whenever they change (Sync User & AI responses)
+    // --- OPTIMIZED SYNC: Persist messages to localStorage & Cloud ---
     useEffect(() => {
         if (!sessionId || messages.length === 0) return;
 
-        const saved = localStorage.getItem('ai-orbit-history');
-        const history = saved ? JSON.parse(saved) : [];
-        const sessionIdx = history.findIndex((h: any) => h.id === sessionId);
+        // 1. Debounce and check streaming state
+        // We only want to sync to Cloud when streaming stops or for user messages
+        const timeout = setTimeout(() => {
+            const saved = localStorage.getItem('ai-orbit-history');
+            const history = saved ? JSON.parse(saved) : [];
+            const sessionIdx = history.findIndex((h: any) => h.id === sessionId);
 
-        if (sessionIdx > -1) {
-            // Update existing session with latest messages (including AI full response)
-            history[sessionIdx].messages = messages;
-            localStorage.setItem('ai-orbit-history', JSON.stringify(history));
+            if (sessionIdx > -1) {
+                // Update local memory
+                history[sessionIdx].messages = messages;
+                localStorage.setItem('ai-orbit-history', JSON.stringify(history));
 
+                // --- SYNC TO CLOUD (Only if NOT streaming or if it's the final update) ---
+                if (user && isSupabaseEnabled && !isStreaming) {
+                    const syncToSupabase = async () => {
+                        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                        if (!uuidRegex.test(sessionId)) return;
 
-            // --- NEW: Sync to Supabase if User is Logged In ---
-            if (user && isSupabaseEnabled && messages.length > 0) {
-                const syncToSupabase = async () => {
-                    // Safety: Validate UUID format (Supabase requires it for the ID column)
-                    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-                    if (!uuidRegex.test(sessionId)) {
-                        console.warn("☁️ Orbit Cloud Bypass: ID bukan format UUID, sinkronisasi cloud dilewati untuk sesi ini.");
-                        return;
-                    }
-
-                    try {
-                        const { error: convErr } = await supabase
-                            .from('conversations')
-                            .upsert({
+                        try {
+                            // 1. Upsert Conversation
+                            await supabase.from('conversations').upsert({
                                 id: sessionId,
                                 user_id: user.id,
                                 title: messages[0].content.slice(0, 40) + (messages[0].content.length > 40 ? '...' : ''),
-                                model: selectedAgent
-                            }, { onConflict: 'id' });
+                                model: selectedAgent,
+                                updated_at: new Date().toISOString()
+                            });
 
-                        if (convErr) {
-                            console.error("❌ Orbit Cloud Sync Error (Conv):", convErr.message, convErr.details);
-                            return;
+                            // 2. Clear and Insert Messages (Atomic-ish)
+                            // We use a small optimization here: only sync if we have a full AI response
+                            const lastMsg = messages[messages.length - 1];
+                            if (lastMsg.role === 'ai' && lastMsg.content.length > 0) {
+                                await supabase.from('messages').delete().eq('conversation_id', sessionId);
+                                const msgData = messages.map(m => ({
+                                    conversation_id: sessionId,
+                                    role: m.role,
+                                    content: m.content,
+                                    attachments: m.attachments || []
+                                }));
+                                await supabase.from('messages').insert(msgData);
+                                console.log("☁️ Orbit Cloud: History synced.");
+                            }
+                        } catch (err) {
+                            console.error("❌ Orbit Cloud Sync Error:", err);
                         }
+                    };
+                    syncToSupabase();
+                }
 
-                        // 2. Sync latest messages (Clean up and insert)
-                        const { error: delErr } = await supabase.from('messages').delete().eq('conversation_id', sessionId);
-                        if (delErr) console.warn("Sync cleanup warn:", delErr.message);
-
-                        const msgData = messages.map(m => ({
-                            conversation_id: sessionId,
-                            role: m.role,
-                            content: m.content,
-                            attachments: m.attachments || []
-                        }));
-
-                        const { error: msgErr } = await supabase.from('messages').insert(msgData);
-                        if (msgErr) throw msgErr;
-
-                        console.log("☁️ Orbit Cloud: Synced successfully.");
-                    } catch (err: any) {
-                        console.error("❌ Orbit Cloud Sync Error:", err.message || err);
-                    }
-                };
-
-                syncToSupabase();
+                // Notify other components (like sidebar) only if not actively streaming
+                // or at reasonable intervals to prevent UI jank/loops
+                if (!isStreaming) {
+                    window.dispatchEvent(new Event('chat-history-updated'));
+                }
             }
+        }, isStreaming ? 2000 : 500); // Wait longer if streaming
 
-            // Trigger refresh so sidebar sees updated state if necessary
-            window.dispatchEvent(new Event('chat-history-updated'));
-        }
-    }, [messages, sessionId, user, selectedAgent]);
+        return () => clearTimeout(timeout);
+    }, [messages, sessionId, user, selectedAgent, isStreaming]);
 
 
     // Auto scroll to bottom
@@ -461,7 +458,10 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                             </motion.div>
                         ) : (
                             <div className="max-w-4xl mx-auto w-full pb-32 pt-20 flex flex-col gap-10 px-6">
-                                {messages.map((msg, i) => (
+                                {messages.filter((m, idx, self) =>
+                                    // Deduplicate identical consecutive messages which often happen during race condition syncs
+                                    idx === 0 || !(m.role === self[idx - 1].role && m.content === self[idx - 1].content)
+                                ).map((msg, i) => (
                                     <motion.div
                                         key={i}
                                         initial={{ opacity: 0, y: 15 }}

@@ -82,22 +82,32 @@ export default function Home() {
               messages: c.messages
             }));
 
-            // --- FIX: ISOLASI DATA ---
-            // Saat login, kita HANYA ingin melihat data dari Cloud untuk user ini.
-            // Kita timpa total local history dengan cloud history agar akun lain tidak tercampur.
-            combinedHistory = cloudHistory;
+            // --- SMART MERGE: Prevent data loss and duplication ---
+            const historyMap = new Map();
 
-            // Simpan ke local storage hanya data milik user ini
+            // Start with Cloud data
+            cloudHistory.forEach(item => historyMap.set(item.id, item));
+
+            // Merge Local data: If local has it and it's newer/different, you might prefer local
+            // but for simplicity, we favor Cloud for consistency, UNLESS it's the active session.
+            combinedHistory.forEach((item: any) => {
+              if (item.id === activeSessionId) {
+                // Keep active session local state as primary truth to avoid flickering/looping
+                historyMap.set(item.id, item);
+              } else if (!historyMap.has(item.id)) {
+                // If cloud doesn't have it yet (newly created), keep local
+                historyMap.set(item.id, item);
+              }
+            });
+
+            combinedHistory = Array.from(historyMap.values());
+
+            // Sync resolved history back to local to keep things in sync
             localStorage.setItem('ai-orbit-history', JSON.stringify(combinedHistory));
           }
         } catch (err) {
           console.error("☁️ Orbit Cloud: Fetch error", err);
         }
-      } else if (!user) {
-        // Jika Guest, pastikan kita tidak menampilkan sisa data dari user yang baru logout
-        // (Opsional, tapi aman jika ingin benar-benar bersih)
-        localStorage.removeItem('ai-orbit-history'); // Clear local storage
-        combinedHistory = []; // Clear in-memory history
       }
 
       setChatHistory(combinedHistory);
