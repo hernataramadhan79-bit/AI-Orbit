@@ -59,7 +59,15 @@ const MessageItem = React.memo(({
                         </div>
                     ) : (
                         <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-black/30 prose-pre:border prose-pre:border-white/5">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                            {(!msg.content || msg.content.trim() === "") && isStreaming ? (
+                                <div className="flex items-center gap-1.5 py-2">
+                                    <motion.div animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0 }} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryColor }} />
+                                    <motion.div animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryColor }} />
+                                    <motion.div animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryColor }} />
+                                </div>
+                            ) : (
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                            )}
                         </div>
                     )}
 
@@ -76,8 +84,8 @@ const MessageItem = React.memo(({
                 </div>
 
                 {/* Message Actions */}
-                {!isEditing && !isStreaming && (
-                    <div className={`flex items-center gap-1 mt-2 transition-opacity duration-300 ${msg.role === 'user' ? 'justify-end opacity-0 group-hover/msg:opacity-100' : 'opacity-0 group-hover/msg:opacity-100'}`}>
+                {!isEditing && (!isStreaming || msg.content?.length > 0) && (
+                    <div className={`flex items-center gap-1 mt-2 transition-opacity duration-300 ${msg.role === 'user' ? 'justify-end opacity-100 md:opacity-0 group-hover/msg:opacity-100' : 'opacity-100 md:opacity-0 group-hover/msg:opacity-100'}`}>
                         <button onClick={() => onCopy(msg.content, i)} className="p-1.5 md:p-2 hover:bg-white/5 rounded-lg text-gray-500 hover:text-gray-300 transition-colors" title="Salin">
                             {copiedId === i ? <Check className="w-3 h-3 md:w-3.5 md:h-3.5" /> : <Copy className="w-3 h-3 md:w-3.5 md:h-3.5" />}
                         </button>
