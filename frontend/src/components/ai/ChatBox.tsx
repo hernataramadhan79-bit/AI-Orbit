@@ -439,19 +439,49 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                     </div>
                                 </div>
                                 <div className="text-center space-y-3">
-                                    <h1 className="text-4xl font-bold text-white tracking-tight">Halo, Apa kabar?</h1>
-                                    <p className="text-gray-500 text-lg">Saya siap membantu pekerjaan formal dan diskusi Anda hari ini.</p>
+                                    <h1 className="text-4xl font-bold text-white tracking-tight">Apa yang bisa saya bantu hari ini?</h1>
+                                    <p className="text-gray-500 text-lg">Partner cerdas untuk eksplorasi ide, coding, dan diskusi produktif.</p>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                                    {['Bantu buatkan email formal', 'Ringkas dokumen teknis'].map((item) => (
+                                    {[
+                                        {
+                                            title: "Eksplorasi Ide Kreatif",
+                                            desc: "Brainstorming konsep unik",
+                                            prompt: "Bantu saya memikirkan 5 ide unik untuk proyek kreatif saya.",
+                                            icon: <Sparkles className="w-4 h-4" />
+                                        },
+                                        {
+                                            title: "Bedah Kode / Masalah Teknis",
+                                            desc: "Coding & Optimasi sistem",
+                                            prompt: "Jelaskan cara kerja kode ini dan bagaimana mengoptimalkannya.",
+                                            icon: <Code className="w-4 h-4" />
+                                        },
+                                        {
+                                            title: "Belajar Konsep Rumit",
+                                            desc: "Jelaskan secara sederhana",
+                                            prompt: "Jelaskan konsep Quantum Physics seolah saya anak usia 10 tahun.",
+                                            icon: <Orbit className="w-4 h-4" />
+                                        },
+                                        {
+                                            title: "Ringkas & Analisis Teks",
+                                            desc: "Temukan poin-poin penting",
+                                            prompt: "Tolong ringkas teks ini menjadi poin-poin yang mudah dipahami.",
+                                            icon: <Activity className="w-4 h-4" />
+                                        }
+                                    ].map((item) => (
                                         <button
-                                            key={item}
-                                            onClick={() => setInput(item)}
-                                            className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-sm text-gray-400 text-left hover:text-white group"
+                                            key={item.title}
+                                            onClick={() => setInput(item.prompt)}
+                                            className="p-5 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-gray-400 text-left hover:text-white group relative overflow-hidden flex items-start gap-4"
                                         >
-                                            <p className="font-medium">{item}</p>
-                                            <p className="text-[10px] text-gray-600 group-hover:text-gray-500 mt-1">Gunakan bahasa formal</p>
+                                            <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors" style={{ color: primaryColor }}>
+                                                {item.icon}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <p className="font-bold text-sm text-white group-hover:translate-x-1 transition-transform">{item.title}</p>
+                                                <p className="text-[11px] text-gray-600 group-hover:text-gray-500 mt-1">{item.desc}</p>
+                                            </div>
                                         </button>
                                     ))}
                                 </div>
