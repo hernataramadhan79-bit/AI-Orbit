@@ -388,14 +388,14 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
         <div className="flex h-full bg-transparent overflow-hidden relative">
             {/* Main Chat Column */}
             <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative">
-                <header className="absolute top-0 left-0 w-full h-16 flex items-center px-6 bg-transparent z-40 pointer-events-none">
+                <header className="absolute top-0 left-0 w-full h-16 flex items-center px-4 md:px-6 bg-transparent z-40 pointer-events-none">
                     <div className="flex items-center justify-between w-full pointer-events-auto">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 md:gap-3">
                             <AnimatePresence>
                                 {!isSidebarOpen && (
                                     <motion.button
                                         initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                                        onClick={toggleSidebar} className="p-2.5 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                                        onClick={toggleSidebar} className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
                                     >
                                         <PanelLeft className="w-5 h-5" />
                                     </motion.button>
@@ -408,18 +408,18 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 onClick={copyAllChat}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-xs font-semibold backdrop-blur-md shadow-xl`}
+                                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-xs font-semibold backdrop-blur-md shadow-xl`}
                                 style={{ color: primaryColor }}
                             >
                                 {copiedId === 'all' ? (
                                     <>
                                         <Check className="w-3.5 h-3.5" />
-                                        <span>Tersalin</span>
+                                        <span className="hidden xs:inline">Tersalin</span>
                                     </>
                                 ) : (
                                     <>
                                         <Copy className="w-3.5 h-3.5" />
-                                        <span>Salin Seluruh Chat</span>
+                                        <span className="hidden xs:inline">Salin Seluruh Chat</span>
                                     </>
                                 )}
                             </motion.button>
@@ -611,32 +611,32 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                     </AnimatePresence>
                 </div>
 
-                <div className="shrink-0 pb-4 pt-2 px-6 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f] to-transparent z-20">
-                    <div className="max-w-6xl mx-auto relative px-4">
+                <div className="shrink-0 pb-4 pt-2 px-3 md:px-6 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f] to-transparent z-20">
+                    <div className="max-w-6xl mx-auto relative md:px-4">
                         <AnimatePresence>
                             {attachments.length > 0 && (
-                                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-wrap gap-2 mb-4">
+                                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-wrap gap-2 mb-4 px-2">
                                     {attachments.map((file, idx) => (
                                         <motion.div
                                             layout
                                             key={idx}
-                                            className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 flex items-center gap-3 text-xs text-gray-200 shadow-xl backdrop-blur-md"
+                                            className="bg-white/5 border border-white/10 rounded-2xl px-3 py-2 md:px-4 md:py-3 flex items-center gap-3 text-xs text-gray-200 shadow-xl backdrop-blur-md"
                                         >
-                                            <div className="w-8 h-8 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400">
+                                            <div className="w-7 h-7 md:w-8 md:h-8 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400">
                                                 {file.type.startsWith('image/') ? <ImageIcon className="w-4 h-4" /> : <Paperclip className="w-4 h-4" />}
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className="max-w-[140px] truncate font-semibold">{file.name}</span>
-                                                <span className="text-[10px] text-gray-500 uppercase tracking-tighter">Ready to send</span>
+                                            <div className="flex flex-col min-w-0">
+                                                <span className="max-w-[100px] md:max-w-[140px] truncate font-semibold">{file.name}</span>
+                                                <span className="text-[9px] md:text-[10px] text-gray-500 uppercase tracking-tighter">Ready</span>
                                             </div>
-                                            <button onClick={() => setAttachments(prev => prev.filter((_, i) => i !== idx))} className="ml-2 w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 text-gray-500 hover:text-white transition-all">✕</button>
+                                            <button onClick={() => setAttachments(prev => prev.filter((_, i) => i !== idx))} className="ml-1 w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 text-gray-500 hover:text-white transition-all">✕</button>
                                         </motion.div>
                                     ))}
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
-                        <div className="relative group w-full mb-4">
+                        <div className="relative group w-full mb-2">
                             {/* Ambient Input Glow */}
                             <div
                                 className="absolute -inset-1 rounded-[32px] blur-3xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-1000 pointer-events-none"
@@ -645,7 +645,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
 
                             <form
                                 onSubmit={handleSend}
-                                className="relative flex items-center bg-[#141414]/95 backdrop-blur-3xl rounded-[32px] border border-white/10 shadow-2xl focus-within:bg-[#181818] focus-within:border-white/20 transition-all duration-400 pl-3 pr-3 py-2.5 min-h-[68px]"
+                                className="relative flex items-center bg-[#141414]/95 backdrop-blur-3xl rounded-[2rem] border border-white/10 shadow-2xl focus-within:bg-[#181818] focus-within:border-white/20 transition-all duration-400 pl-2 md:pl-3 pr-2 md:pr-3 py-1.5 md:py-2.5 min-h-[58px] md:min-h-[68px]"
                             >
                                 <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => handleFileUpload(e, 'file')} />
                                 <input type="file" accept="image/*" ref={imageInputRef} className="hidden" onChange={(e) => handleFileUpload(e, 'image')} />
@@ -655,13 +655,13 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                     <button
                                         type="button"
                                         onClick={() => setDropdownOpen(!dropdownOpen)}
-                                        className="flex items-center gap-2.5 px-4 h-11 rounded-2xl transition-all text-xs font-bold text-gray-400 hover:text-white group border border-white/5 bg-white/[0.03] hover:bg-white/[0.08]"
+                                        className="flex items-center gap-2 px-3 md:px-4 h-11 rounded-2xl transition-all text-xs font-bold text-gray-400 hover:text-white group border border-white/5 bg-white/[0.03] hover:bg-white/[0.08]"
                                     >
                                         <div className="relative flex items-center justify-center">
                                             <div className="absolute inset-0 blur-md rounded-full animate-pulse opacity-40 transition-colors" style={{ backgroundColor: primaryColor }} />
                                             <Orbit className="w-4 h-4 relative z-10 group-hover:rotate-90 transition-transform duration-500" style={{ color: primaryColor }} />
                                         </div>
-                                        <span className="hidden md:inline tracking-tight">{selectedAgent.split(' / ')[1]}</span>
+                                        <span className="hidden lg:inline tracking-tight">{selectedAgent.split(' / ')[1]}</span>
                                         <ChevronDown className={`w-3.5 h-3.5 opacity-50 hidden md:inline transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
                                     </button>
 
@@ -671,7 +671,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                                 initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                                 animate={{ opacity: 1, scale: 1, y: -4 }}
                                                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                                className="absolute bottom-full left-0 mb-4 w-64 bg-[#1a1a1a] border border-white/10 rounded-[24px] shadow-2xl py-3 z-[110] overflow-hidden backdrop-blur-3xl"
+                                                className="absolute bottom-full left-0 mb-4 w-60 md:w-64 bg-[#1a1a1a] border border-white/10 rounded-[24px] shadow-2xl py-3 z-[110] overflow-hidden backdrop-blur-3xl"
                                             >
                                                 <div className="px-5 pb-2 mb-2 border-b border-white/5 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Pilih Intelligence</div>
                                                 {agents.map((ag) => {
@@ -680,7 +680,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                                         <button
                                                             key={ag.name}
                                                             onClick={() => { setSelectedAgent(ag.name); setDropdownOpen(false); }}
-                                                            className={`w-full text-left px-5 py-3 flex items-center gap-4 transition-all text-[14px] group relative ${isActive ? 'text-white' : 'hover:bg-white/5 text-gray-300 hover:text-white'
+                                                            className={`w-full text-left px-5 py-3 flex items-center gap-4 transition-all text-sm group relative ${isActive ? 'text-white' : 'hover:bg-white/5 text-gray-300 hover:text-white'
                                                                 }`}
                                                             style={isActive ? { backgroundColor: `${primaryColor}1a`, color: primaryColor } : {}}
                                                         >
@@ -690,7 +690,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                                             >
                                                                 {ag.icon}
                                                             </div>
-                                                            <span className="font-semibold flex-1">{ag.name}</span>
+                                                            <span className="font-semibold flex-1">{ag.name.split(' / ')[1] || ag.name}</span>
                                                             {isActive && (
                                                                 <div className="relative flex items-center justify-center mr-1">
                                                                     <div className="absolute w-2 h-2 rounded-full blur-sm animate-pulse" style={{ backgroundColor: primaryColor }} />
@@ -705,13 +705,13 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                     </AnimatePresence>
                                 </div>
 
-                                <div className="w-px h-6 bg-white/10 mx-2 hidden sm:block"></div>
+                                <div className="w-px h-6 bg-white/10 mx-1 md:mx-2 hidden sm:block"></div>
 
                                 {/* Attachment Action */}
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="p-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all shrink-0 group"
+                                    className="p-2.5 md:p-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all shrink-0 group"
                                     title="Lampirkan file"
                                 >
                                     <Paperclip className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -724,18 +724,18 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                         value={input}
                                         onChange={handleInput}
                                         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(e); } }}
-                                        placeholder="Tanya sesuatu..."
-                                        className="w-full bg-transparent py-3 px-1 text-[16px] text-gray-100 focus:outline-none resize-none placeholder-gray-500 leading-relaxed custom-scrollbar overflow-y-auto max-h-[200px] min-h-[44px] flex items-center"
+                                        placeholder="Tanya..."
+                                        className="w-full bg-transparent py-2.5 md:py-3 px-1 text-sm md:text-[16px] text-gray-100 focus:outline-none resize-none placeholder-gray-500 leading-relaxed custom-scrollbar overflow-y-auto max-h-[150px] md:max-h-[200px] min-h-[38px] md:min-h-[44px] flex items-center"
                                         rows={1}
                                     />
                                 </div>
 
                                 {/* Right Actions */}
-                                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                                <div className="flex items-center gap-1 md:gap-1.5 shrink-0 ml-1 md:ml-2">
                                     <button
                                         type="button"
                                         onClick={startVoiceInput}
-                                        className="p-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all hidden sm:flex items-center justify-center"
+                                        className="p-2.5 md:p-3 text-gray-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all hidden md:flex items-center justify-center"
                                         title="Voice Input"
                                     >
                                         <Mic className="w-5 h-5" />
@@ -745,7 +745,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                         <button
                                             type="button"
                                             onClick={stopStream}
-                                            className="w-11 h-11 flex items-center justify-center text-white bg-white/10 hover:bg-red-500/20 hover:text-red-400 rounded-2xl transition-all shadow-lg border border-white/5"
+                                            className="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center text-white bg-white/10 hover:bg-red-500/20 hover:text-red-400 rounded-2xl transition-all shadow-lg border border-white/5"
                                         >
                                             <Square className="w-4 h-4 fill-current" />
                                         </button>
@@ -755,7 +755,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                             whileTap={(input.trim() || attachments.length > 0) ? { scale: 0.98 } : {}}
                                             type="submit"
                                             disabled={!input.trim() && attachments.length === 0}
-                                            className={`w-11 h-11 rounded-2xl transition-all duration-300 flex items-center justify-center ${(input.trim() || attachments.length > 0)
+                                            className={`w-10 h-10 md:w-11 md:h-11 rounded-2xl transition-all duration-300 flex items-center justify-center ${(input.trim() || attachments.length > 0)
                                                 ? 'shadow-xl'
                                                 : 'bg-white/[0.03] text-gray-600 cursor-not-allowed border border-white/5'
                                                 }`}
@@ -765,7 +765,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                                 boxShadow: `0 8px 16px ${primaryColor}33`
                                             } : {}}
                                         >
-                                            <Send className={`w-5 h-5 ${(input.trim() || attachments.length > 0) ? 'fill-black/20' : ''}`} />
+                                            <Send className={`w-4 h-4 md:w-5 md:h-5 ${(input.trim() || attachments.length > 0) ? 'fill-black/20' : ''}`} />
                                         </motion.button>
                                     )}
                                 </div>
