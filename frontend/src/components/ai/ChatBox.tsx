@@ -54,8 +54,8 @@ const MessageItem = React.memo(({
                                 className="w-full bg-[#1a1a1a] text-white p-4 rounded-xl border border-white/10 focus:outline-none focus:border-blue-500/50 min-h-[100px]"
                             />
                             <div className="flex justify-end gap-2">
-                                <button onClick={onEditCancel} className="px-3 py-1.5 text-xs text-gray-400 hover:text-white">Batal</button>
-                                <button onClick={() => onEditSave(editContent)} className="px-4 py-1.5 text-xs bg-white/10 hover:bg-white/20 rounded-lg font-bold">Simpan & Kirim</button>
+                                <button onClick={onEditCancel} className="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition-colors">Batal</button>
+                                <button onClick={() => onEditSave(i)} className="px-4 py-1.5 text-xs bg-white/10 hover:bg-white/20 rounded-xl font-bold transition-all active:scale-95">Simpan & Kirim</button>
                             </div>
                         </div>
                     ) : (
@@ -562,7 +562,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
     return (
         <div className="flex h-full bg-transparent overflow-hidden relative">
             {/* Main Chat Column */}
-            <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative max-h-full">
+            <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative">
                 <header className="absolute top-2 md:top-4 left-0 w-full h-12 md:h-16 flex items-center px-4 md:px-8 bg-transparent z-40 pointer-events-none">
                     <div className="flex items-center justify-between w-full pointer-events-auto">
                         <div className="flex items-center gap-2 md:gap-3">
@@ -712,7 +712,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                     </AnimatePresence>
                 </div>
 
-                <div className="shrink-0 pb-[env(safe-area-inset-bottom,12px)] md:pb-6 pt-2 px-3 md:px-6 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f] to-transparent z-20">
+                <div className="shrink-0 pb-7 md:pb-6 pt-2 px-3 md:px-6 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f] to-transparent z-20">
                     <div className="max-w-6xl mx-auto relative md:px-4">
                         <AnimatePresence>
                             {attachments.length > 0 && (

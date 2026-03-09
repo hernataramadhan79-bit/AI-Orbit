@@ -207,7 +207,7 @@ export default function Home() {
 
 
   return (
-    <main className="flex h-screen h-[100dvh] w-full bg-[#0f0f0f] overflow-hidden text-gray-200 font-sans relative" style={{ ['--tw-selection-bg' as any]: `${primaryColor}4d` }}>
+    <main className="flex h-[100dvh] w-full bg-[#0f0f0f] overflow-hidden text-gray-200 font-sans relative" style={{ ['--tw-selection-bg' as any]: `${primaryColor}4d` }}>
       {/* Background Ambient Light */}
       <div
         className="fixed top-0 left-1/2 -translate-x-1/2 w-[80%] h-[40%] blur-[120px] pointer-events-none z-0 transition-colors duration-1000"
@@ -421,7 +421,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <div className="flex-1 flex flex-col relative h-full max-h-full min-w-0 z-10 overflow-hidden">
+      <div className="flex-1 flex flex-col relative h-full min-w-0 z-10 overflow-hidden">
         <ChatBox
           isSidebarOpen={isSidebarOpen}
           toggleSidebar={toggleSidebar}
