@@ -78,16 +78,11 @@ async def synthesize_voice(request: dict):
     try:
         from app.core.tools.voice import voice_tool
         
-        if not voice_tool or not voice_tool.available:
-            raise HTTPException(
-                status_code=503,
-                detail="Layanan suara tidak tersedia. Tambahkan ELEVENLABS_API_KEY di .env"
-            )
-        
+        if not voice_tool:
+            raise HTTPException(status_code=503, detail="Voice tool belum diinisialisasi")
+
+        # synthesize sekarang akan raise exception jika gagal
         audio_bytes = await voice_tool.synthesize(text, voice_id=voice_id)
-        
-        if audio_bytes is None:
-            raise HTTPException(status_code=500, detail="Gagal menghasilkan suara.")
         
         return StreamingResponse(
             iter([audio_bytes]),
@@ -97,9 +92,9 @@ async def synthesize_voice(request: dict):
                 "Content-Length": str(len(audio_bytes)),
             }
         )
-    except HTTPException:
-        raise
     except Exception as e:
+        # Tampilkan error asli (misal: "Quota Exceeded") ke browser
+        print(f"DEBUG VOICE ERROR: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
