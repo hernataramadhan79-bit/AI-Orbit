@@ -308,7 +308,7 @@ export default function Home() {
                       >
                         <MessageSquare className={`w-4 h-4 ${activeSessionId === chat.id ? 'opacity-100' : 'opacity-40 group-hover:opacity-100'}`} />
                         <span className="truncate flex-1 font-medium">{chat.title}</span>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={(e) => togglePinChat(chat.id, e)}
                             className="p-1.5 hover:bg-white/10 rounded-lg transition-all"
@@ -354,7 +354,7 @@ export default function Home() {
                       >
                         <MessageSquare className={`w-4 h-4 ${activeSessionId === chat.id ? 'opacity-100' : 'opacity-40 group-hover:opacity-100'}`} />
                         <span className="truncate flex-1 font-medium">{chat.title}</span>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={(e) => togglePinChat(chat.id, e)}
                             className="p-1.5 hover:bg-white/10 rounded-lg transition-all"
