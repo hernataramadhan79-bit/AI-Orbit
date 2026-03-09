@@ -712,7 +712,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                     </AnimatePresence>
                 </div>
 
-                <div className="shrink-0 pb-4 pt-2 px-3 md:px-6 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f] to-transparent z-20">
+                <div className="shrink-0 pb-3 md:pb-6 pt-2 px-3 md:px-6 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f] to-transparent z-20">
                     <div className="max-w-6xl mx-auto relative md:px-4">
                         <AnimatePresence>
                             {attachments.length > 0 && (
@@ -737,7 +737,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                             )}
                         </AnimatePresence>
 
-                        <div className="relative group w-full mb-2">
+                        <div className="relative group w-full mb-0 md:mb-2">
                             {/* Ambient Input Glow */}
                             <div
                                 className="absolute -inset-1 rounded-[32px] blur-3xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-1000 pointer-events-none"
