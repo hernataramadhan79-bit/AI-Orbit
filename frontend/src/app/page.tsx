@@ -27,7 +27,7 @@ const generateUUID = () => {
 
 
 export default function Home() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [chatHistory, setChatHistory] = useState<{ id: string, title: string, messages?: any[], pinned?: boolean }[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -267,19 +267,13 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="p-4 pt-2 flex items-center justify-between">
+              <div className="p-4 pt-2 flex items-center">
                 <button
                   onClick={createNewChat}
-                  className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium flex-1 text-left border border-white/10 active:scale-[0.98] group"
+                  className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl transition-all duration-300 text-sm font-bold flex-1 text-left border border-white/10 active:scale-[0.98] group"
                 >
-                  <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
+                  <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" style={{ color: primaryColor }} />
                   <span>Percakapan Baru</span>
-                </button>
-                <button
-                  onClick={toggleSidebar}
-                  className="p-2.5 text-gray-400 hover:text-gray-100 hover:bg-white/5 rounded-xl transition-colors ml-2"
-                >
-                  <PanelLeft className="w-5 h-5" />
                 </button>
               </div>
 
@@ -433,6 +427,7 @@ export default function Home() {
           toggleSidebar={toggleSidebar}
           sessionId={activeSessionId}
           initialMessages={activeSession?.messages}
+          onNewChat={createNewChat}
         />
       </div>
 

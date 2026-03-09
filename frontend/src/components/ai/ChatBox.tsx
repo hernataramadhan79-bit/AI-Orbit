@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useChatStream } from '../../hooks/useChatStream';
 import { useAgentStore } from '../../store/useAgentStore';
-import { Send, Square, Paperclip, Image as ImageIcon, Mic, ChevronDown, Sparkles, Globe, Activity, PanelLeft, User, Copy, Check, Pencil, Orbit, Code, RotateCcw, Layout } from 'lucide-react';
+import { Send, Square, Paperclip, Image as ImageIcon, Mic, ChevronDown, Sparkles, Globe, Activity, PanelLeft, User, Copy, Check, Pencil, Orbit, Code, RotateCcw, Layout, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -19,6 +19,7 @@ interface ChatBoxProps {
     toggleSidebar: () => void;
     sessionId: string | null;
     initialMessages?: { role: 'user' | 'ai', content: string }[];
+    onNewChat?: () => void;
 }
 
 const MessageItem = React.memo(({
@@ -127,7 +128,7 @@ const MessageItem = React.memo(({
 
 MessageItem.displayName = 'MessageItem';
 
-export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initialMessages = [] }: ChatBoxProps) {
+export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initialMessages = [], onNewChat }: ChatBoxProps) {
     const [input, setInput] = useState('');
     const [selectedAgent, setSelectedAgent] = useState('Auto / Orbit Brain');
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -524,16 +525,29 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
         <div className="flex h-full bg-transparent overflow-hidden relative">
             {/* Main Chat Column */}
             <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative">
-                <header className="absolute top-0 left-0 w-full h-12 md:h-16 flex items-center px-4 md:px-6 bg-transparent z-40 pointer-events-none">
+                <header className="absolute top-2 md:top-4 left-0 w-full h-12 md:h-16 flex items-center px-4 md:px-8 bg-transparent z-40 pointer-events-none">
                     <div className="flex items-center justify-between w-full pointer-events-auto">
                         <div className="flex items-center gap-2 md:gap-3">
+                            <motion.button
+                                onClick={toggleSidebar}
+                                className="p-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all shadow-lg backdrop-blur-md bg-black/20 border border-white/5 active:scale-95"
+                                title={isSidebarOpen ? "Tutup Sidebar" : "Buka Sidebar"}
+                            >
+                                <PanelLeft className="w-5 h-5 md:w-5.5 md:h-5.5" />
+                            </motion.button>
+
                             <AnimatePresence>
                                 {!isSidebarOpen && (
                                     <motion.button
-                                        initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                                        onClick={toggleSidebar} className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                                        initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                                        exit={{ opacity: 0, scale: 0.8, x: -10 }}
+                                        onClick={onNewChat}
+                                        className="p-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all shadow-lg backdrop-blur-md bg-black/20 border border-white/5 active:scale-95 flex items-center gap-2"
+                                        title="Chat Baru"
                                     >
-                                        <PanelLeft className="w-5 h-5" />
+                                        <Plus className="w-5 h-5 md:w-5.5 md:h-5.5" />
+                                        <span className="text-xs font-bold hidden sm:inline pr-1">Baru</span>
                                     </motion.button>
                                 )}
                             </AnimatePresence>
