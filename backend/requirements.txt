@@ -19,3 +19,4 @@ langchain-openai
 tavily-python
 elevenlabs
 python-multipart
+edge-tts
