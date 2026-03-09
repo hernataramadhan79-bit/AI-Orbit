@@ -283,11 +283,11 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-3 mt-4 space-y-4 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto px-2 md:px-3 mt-4 space-y-3 md:space-y-4 custom-scrollbar">
                 {/* Pinned Chats */}
                 {chatHistory.some(chat => chat.pinned) && (
                   <div className="space-y-2">
-                    <div className="px-3 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <div className="px-3 py-1.5 md:py-2 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] flex items-center gap-2">
                       <Pin className="w-2.5 h-2.5" style={{ color: primaryColor }} />
                       <span>Tersemat</span>
                     </div>
@@ -331,7 +331,7 @@ export default function Home() {
 
                 {/* Regular Chats */}
                 <div className="space-y-2">
-                  <div className="px-3 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Riwayat</div>
+                  <div className="px-3 py-1.5 md:py-2 text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Riwayat</div>
                   {chatHistory.filter(chat => !chat.pinned).length === 0 && !chatHistory.some(chat => chat.pinned) ? (
                     <div className="px-4 py-12 text-center">
                       <p className="text-xs text-gray-600 italic">Belum ada riwayat percakapan</p>

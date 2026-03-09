@@ -44,7 +44,7 @@ const MessageItem = React.memo(({
                 </div>
             )}
             <div className={`relative min-w-0 max-w-[92%] sm:max-w-[85%] md:max-w-[75%] ${msg.role === 'user' ? '' : 'flex-1'}`}>
-                <div className={`text-[14px] md:text-[15px] leading-relaxed relative ${msg.role === 'user' ? 'bg-[#2a2a2a] text-gray-100 px-4 md:px-6 py-3 md:py-4 rounded-[1.5rem] md:rounded-[2rem] rounded-tr-sm shadow-xl border border-white/5' : 'text-gray-200 py-2'}`}>
+                <div className={`text-[14px] md:text-[15px] leading-relaxed relative ${msg.role === 'user' ? 'bg-[#2a2a2a] text-gray-100 px-3 md:px-6 py-2 md:py-4 rounded-[1.25rem] md:rounded-[2rem] rounded-tr-sm shadow-xl border border-white/5' : 'text-gray-200 py-1 md:py-2'}`}>
                     {isEditing ? (
                         <div className="flex flex-col gap-3">
                             <textarea
@@ -522,7 +522,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
         <div className="flex h-full bg-transparent overflow-hidden relative">
             {/* Main Chat Column */}
             <div className="flex flex-col flex-1 min-w-0 overflow-hidden relative">
-                <header className="absolute top-0 left-0 w-full h-16 flex items-center px-4 md:px-6 bg-transparent z-40 pointer-events-none">
+                <header className="absolute top-0 left-0 w-full h-12 md:h-16 flex items-center px-4 md:px-6 bg-transparent z-40 pointer-events-none">
                     <div className="flex items-center justify-between w-full pointer-events-auto">
                         <div className="flex items-center gap-2 md:gap-3">
                             <AnimatePresence>
@@ -564,64 +564,70 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                 <div className="flex-1 overflow-y-auto w-full scroll-smooth custom-scrollbar" ref={chatContainerRef}>
                     <AnimatePresence mode="wait">
                         {messages.length === 0 ? (
-                            <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col h-full items-center justify-center text-gray-500 space-y-8 max-w-2xl mx-auto px-6 mt-[-5vh]">
+                            <motion.div
+                                key="empty"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex flex-col h-full items-center justify-center text-gray-500 space-y-6 md:space-y-8 max-w-2xl mx-auto px-4 md:px-6 pt-10 md:pt-0"
+                            >
                                 <div className="relative">
-                                    <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }} transition={{ repeat: Infinity, duration: 6 }} className="absolute inset-0 blur-[80px] rounded-full" style={{ backgroundColor: primaryColor }}></motion.div>
-                                    <div className="relative w-24 h-24 rounded-[2rem] bg-white/5 flex items-center justify-center shadow-2xl border border-white/10 group overflow-hidden">
+                                    <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }} transition={{ repeat: Infinity, duration: 6 }} className="absolute inset-0 blur-[60px] md:blur-[80px] rounded-full" style={{ backgroundColor: primaryColor }}></motion.div>
+                                    <div className="relative w-16 h-16 md:w-24 md:h-24 rounded-2xl md:rounded-[2rem] bg-white/5 flex items-center justify-center shadow-2xl border border-white/10 group overflow-hidden">
                                         <div className="absolute inset-0 bg-gradient-to-tr opacity-20 group-hover:opacity-30 transition-opacity duration-500" style={{ backgroundImage: `linear-gradient(to top right, ${primaryColor}, transparent)` }}></div>
-                                        <Orbit className="w-10 h-10 group-hover:rotate-180 transition-transform duration-700 relative z-10" style={{ color: primaryColor }} />
+                                        <Orbit className="w-8 h-8 md:w-10 md:h-10 group-hover:rotate-180 transition-transform duration-700 relative z-10" style={{ color: primaryColor }} />
                                     </div>
                                 </div>
-                                <div className="text-center space-y-3">
-                                    <h1 className="text-4xl font-bold text-white tracking-tight">Apa yang bisa saya bantu hari ini?</h1>
-                                    <p className="text-gray-500 text-lg">Partner cerdas untuk eksplorasi ide, coding, dan diskusi produktif.</p>
+                                <div className="text-center space-y-2 md:space-y-3">
+                                    <h1 className="text-2xl md:text-4xl font-bold text-white tracking-tight">Apa yang bisa saya bantu hari ini?</h1>
+                                    <p className="text-gray-500 text-sm md:text-lg px-4 md:px-0">Partner cerdas untuk eksplorasi ide, coding, dan diskusi produktif.</p>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 w-full">
                                     {[
                                         {
                                             title: "Eksplorasi Ide Kreatif",
                                             desc: "Brainstorming konsep unik",
                                             prompt: "Bantu saya memikirkan 5 ide unik untuk proyek kreatif saya.",
-                                            icon: <Sparkles className="w-4 h-4" />
+                                            icon: Sparkles
                                         },
                                         {
                                             title: "Bedah Kode / Masalah Teknis",
                                             desc: "Coding & Optimasi sistem",
                                             prompt: "Jelaskan cara kerja kode ini dan bagaimana mengoptimalkannya.",
-                                            icon: <Code className="w-4 h-4" />
+                                            icon: Code
                                         },
                                         {
                                             title: "Belajar Konsep Rumit",
                                             desc: "Jelaskan secara sederhana",
                                             prompt: "Jelaskan konsep Quantum Physics seolah saya anak usia 10 tahun.",
-                                            icon: <Orbit className="w-4 h-4" />
+                                            icon: Orbit
                                         },
                                         {
                                             title: "Ringkas & Analisis Teks",
                                             desc: "Temukan poin-poin penting",
                                             prompt: "Tolong ringkas teks ini menjadi poin-poin yang mudah dipahami.",
-                                            icon: <Activity className="w-4 h-4" />
+                                            icon: Activity
                                         }
                                     ].map((item) => (
                                         <button
                                             key={item.title}
                                             onClick={() => setInput(item.prompt)}
-                                            className="p-5 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-gray-400 text-left hover:text-white group relative overflow-hidden flex items-start gap-4"
+                                            className="p-3 md:p-5 rounded-2xl md:rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-gray-400 text-left hover:text-white group relative overflow-hidden flex items-center md:items-start gap-3 md:gap-4"
                                         >
-                                            <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors" style={{ color: primaryColor }}>
-                                                {item.icon}
+                                            <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors shrink-0" style={{ color: primaryColor }}>
+                                                <item.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                             </div>
-                                            <div className="flex flex-col">
-                                                <p className="font-bold text-sm text-white group-hover:translate-x-1 transition-transform">{item.title}</p>
-                                                <p className="text-[11px] text-gray-600 group-hover:text-gray-500 mt-1">{item.desc}</p>
+                                            <div className="flex flex-col min-w-0">
+                                                <p className="font-bold text-xs md:text-sm text-white group-hover:translate-x-1 transition-transform truncate">{item.title}</p>
+                                                <p className="text-[10px] md:text-[11px] text-gray-600 group-hover:text-gray-500 mt-0.5 md:mt-1 truncate">{item.desc}</p>
                                             </div>
                                         </button>
                                     ))}
                                 </div>
                             </motion.div>
                         ) : (
-                            <div className="max-w-4xl mx-auto w-full pb-32 pt-20 flex flex-col gap-10 px-6">
+                            <div className="max-w-4xl mx-auto w-full pb-32 pt-16 md:pt-20 flex flex-col gap-6 md:gap-10 px-4 md:px-6">
                                 {messages.filter((m, idx, self) =>
                                     // Deduplicate identical consecutive messages which often happen during race condition syncs
                                     idx === 0 || !(m.role === self[idx - 1].role && m.content === self[idx - 1].content)
@@ -889,6 +895,6 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                 artifact={currentArtifact}
                 onClose={() => setCurrentArtifact(null)}
             />
-        </div>
+        </div >
     );
 }
