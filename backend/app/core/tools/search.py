@@ -32,7 +32,7 @@ class WebSearchTool:
         try:
             # Tavily client sinkron, jalankan di executor agar tidak blocking
             loop = asyncio.get_event_loop()
-            response = await loop.run_in_executor(
+            task = loop.run_in_executor(
                 None,
                 lambda: self._client.search(
                     query=query,
@@ -42,6 +42,9 @@ class WebSearchTool:
                     include_raw_content=False,
                 )
             )
+            
+            # Berikan timeout 12 detik agar tidak stuck selamanya
+            response = await asyncio.wait_for(task, timeout=12.0)
             
             results = []
             for r in response.get("results", []):

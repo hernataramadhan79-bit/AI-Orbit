@@ -10,8 +10,8 @@ class OpenAIAdapter(BaseAIProvider):
     """
     def __init__(self, api_key: str, base_url: str = None, default_model: str = "deepseek-ai/deepseek-r1"):
         self.default_model = default_model
-        # Timeout write dinaikkan ke 30.0s agar upload gambar besar (Base64) tidak drop ("terhenti sendiri")
-        timeout = httpx.Timeout(connect=10.0, read=300.0, write=30.0, pool=10.0)
+        # Timeout read diturunkan ke 60.0s agar tidak stuck selamanya jika server hang
+        timeout = httpx.Timeout(connect=10.0, read=60.0, write=30.0, pool=10.0)
         self.client = AsyncOpenAI(api_key=api_key, base_url=base_url, timeout=timeout)
 
     def _process_message_content(self, text_content: str, attachments: list) -> list | str:
@@ -75,8 +75,11 @@ class OpenAIAdapter(BaseAIProvider):
             role = "assistant" if role == "ai" else role
             
             # NVIDIA / Llama-3.2-Vision strict requirement: Max 1 image in conversation
-            # Jadi kita abaikan gambar dari riwayat (history) dan hanya panggil image_url untuk pesan saat ini.
-            messages.append({"role": role, "content": content})
+            # Skip empty content to prevent provider rejection
+            if content and content.strip():
+                messages.append({"role": role, "content": content})
+            elif role == "system":
+                 messages.append({"role": role, "content": content})
             
         current_processed = self._process_message_content(prompt, attachments)
         if isinstance(current_processed, list):
@@ -120,8 +123,8 @@ INSTRUKSI UTAMA:
             "stream": False
         }
         
-        # Thinking/Reasoning specific to DeepSeek R1/Kimi on some providers
-        if "deepseek-r1" in model.lower() or "kimi" in model.lower():
+        # Thinking/Reasoning support ONLY for specific NVIDIA '-thinking' models
+        if "-thinking" in model.lower():
             params["extra_body"] = {"chat_template_kwargs": {"thinking": True}}
 
         completion = await self.client.chat.completions.create(**params)
@@ -162,28 +165,30 @@ INSTRUKSI UTAMA:
             "stream": True
         }
         
-        # Thinking/Reasoning specific to DeepSeek R1 on some providers
-        # Thinking/Reasoning specific to DeepSeek R1/Kimi on some providers
-        if "deepseek-r1" in model.lower() or "kimi" in model.lower():
-            params["extra_body"] = {"chat_template_kwargs": {"thinking": True}}
-            
-        completion = await self.client.chat.completions.create(**params)
+        # Thinking/Reasoning support ONLY for specific NVIDIA '-thinking' models
+        print(f"DEBUG: Starting stream for model: {model} (Profile: {'GPT-4o Class' if '405b' in model.lower() else model})")
         
-        async for chunk in completion:
-            if not getattr(chunk, "choices", None) or len(chunk.choices) == 0:
-                continue
+        try:
+            completion = await self.client.chat.completions.create(**params)
+            
+            async for chunk in completion:
+                if not getattr(chunk, "choices", None) or len(chunk.choices) == 0:
+                    continue
+                    
+                delta = chunk.choices[0].delta
                 
-            delta = chunk.choices[0].delta
-            
-            # Mendukung DeepSeek Reasoning/Thinking content
-            # Jika ada reasoning_content, kita kirimkan juga agar user tahu AI sedang berpikir
-            reasoning = getattr(delta, "reasoning_content", None)
-            content = getattr(delta, "content", None)
-            
-            if reasoning is not None:
-                # Kita bisa memberikan prefix atau membiarkannya mengalir
-                # Untuk UX yang simpel, kita gabungkan saja
-                yield reasoning
-            elif content is not None:
-                yield content
-
+                # Sesuai rekonstruksi user untuk DeepSeek Reasoning
+                reasoning = getattr(delta, "reasoning_content", None)
+                content = getattr(delta, "content", None)
+                
+                if reasoning:
+                    # print(f"DEBUG: Reasoning detected: {reasoning[:20]}...")
+                    yield f"__REASONING__:{reasoning}"
+                
+                if content is not None:
+                    # print(f"DEBUG: Content detected: {content[:20]}...")
+                    yield content
+                    
+        except Exception as e:
+            print(f"DEBUG: Stream error for {model}: {str(e)}")
+            yield f"❌ Error API ({model}): {str(e)}"

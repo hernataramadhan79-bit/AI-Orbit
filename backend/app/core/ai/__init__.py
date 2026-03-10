@@ -9,12 +9,6 @@ ai_manager.register_provider("gpt", OpenAIAdapter(
     default_model=settings.DEFAULT_MODEL_GPT
 ))
 
-ai_manager.register_provider("deepseek", OpenAIAdapter(
-    api_key=settings.NVIDIA_API_KEY_DEEPSEEK,
-    base_url="https://integrate.api.nvidia.com/v1",
-    default_model=settings.DEFAULT_MODEL_DEEPSEEK
-))
-
 ai_manager.register_provider("llama", OpenAIAdapter(
     api_key=settings.NVIDIA_API_KEY_LLAMA,
     base_url="https://integrate.api.nvidia.com/v1",
@@ -31,6 +25,12 @@ ai_manager.register_provider("kimi", OpenAIAdapter(
     api_key=settings.NVIDIA_API_KEY_KIMI,
     base_url="https://integrate.api.nvidia.com/v1",
     default_model=settings.DEFAULT_MODEL_KIMI
+))
+
+ai_manager.register_provider("turbo", OpenAIAdapter(
+    api_key=settings.NVIDIA_API_KEY_LLAMA,
+    base_url="https://integrate.api.nvidia.com/v1",
+    default_model=settings.DEFAULT_MODEL_TURBO
 ))
 
 

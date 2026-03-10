@@ -107,6 +107,13 @@ export function useChatStream() {
                     try {
                         const parsed = JSON.parse(dataContent);
                         if (typeof parsed === 'string') {
+                            // Jika kita menerima konten teks tapi step-nya masih 'searching' atau 'reasoning',
+                            // paksa ke 'answering' agar UI Thinking Status tertutup.
+                            const currentStep = useAgentStore.getState().currentStep;
+                            if (currentStep !== 'answering' && currentStep !== 'idle') {
+                                setAgentStep('answering', 'Menyusun jawaban...', model);
+                            }
+
                             setMessagesWithRef((prev) => {
                                 if (prev.length === 0) return prev;
                                 const next = [...prev];

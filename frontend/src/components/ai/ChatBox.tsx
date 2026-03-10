@@ -12,6 +12,7 @@ import { supabase, isSupabaseEnabled } from '@/lib/supabase';
 import { useThemeStore } from '../../store/useThemeStore';
 import ArtifactPanel, { Artifact } from './ArtifactPanel';
 import VoicePlayer from './VoicePlayer';
+import ThinkingStatus from './ThinkingStatus';
 import { useAuthStore } from '@/store/useAuthStore';
 
 interface ChatBoxProps {
@@ -25,7 +26,7 @@ interface ChatBoxProps {
 const MessageItem = React.memo(({
     msg, i, isStreaming, primaryColor, onCopy, copiedId,
     onEdit, isEditing, onEditCancel, onEditSave, editContent,
-    onEditContentChange, onRegenerate, isLast, extractArtifact, setCurrentArtifact, sessionId
+    onEditContentChange, onRegenerate, isLast, extractArtifact, setCurrentArtifact, sessionId, currentStep
 }: any) => {
     return (
         <motion.div
@@ -35,17 +36,20 @@ const MessageItem = React.memo(({
             className={`flex gap-3 md:gap-5 group/msg ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
         >
             {msg.role === 'ai' && (
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl p-[1px] flex-shrink-0 shadow-lg overflow-hidden group/avatar" style={{ background: `linear-gradient(to top right, ${primaryColor}88, transparent)` }}>
-                    <div className="w-full h-full rounded-xl md:rounded-2xl bg-[#0f0f0f] flex items-center justify-center">
-                        <Orbit
-                            className={`w-4 h-4 md:w-5 md:h-5 transition-transform duration-700 ${isStreaming ? 'animate-spin' : 'group-hover/avatar:rotate-180'}`}
-                            style={{ color: primaryColor, animationDuration: '3s' }}
-                        />
+                <div className="flex-shrink-0">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl p-[1px] shadow-lg overflow-hidden group/avatar" style={{ background: `linear-gradient(to top right, ${primaryColor}88, transparent)` }}>
+                        <div className="w-full h-full rounded-xl md:rounded-2xl bg-[#0f0f0f] flex items-center justify-center">
+                            <Orbit
+                                className={`w-4 h-4 md:w-5 md:h-5 transition-transform duration-700 ${isStreaming ? 'animate-spin' : 'group-hover/avatar:rotate-180'}`}
+                                style={{ color: primaryColor, animationDuration: '3s' }}
+                            />
+                        </div>
                     </div>
                 </div>
             )}
             <div className={`relative min-w-0 max-w-[92%] sm:max-w-[85%] md:max-w-[75%] ${msg.role === 'user' ? '' : 'flex-1'}`}>
-                <div className={`text-[14px] md:text-[15px] leading-relaxed relative ${msg.role === 'user' ? 'bg-[#262626] text-gray-100 px-4 md:px-7 py-2.5 md:py-4 rounded-2xl md:rounded-[2rem] rounded-tr-none shadow-2xl border border-white/5' : 'text-gray-200 py-1.5 md:py-2.5'}`}>
+                {msg.role === 'ai' && isStreaming && <ThinkingStatus isInline={true} />}
+                <div className={`text-[14px] md:text-[15px] leading-relaxed relative break-words overflow-hidden ${msg.role === 'user' ? 'bg-[#262626] text-gray-100 px-4 md:px-7 py-2.5 md:py-4 rounded-2xl md:rounded-[2rem] rounded-tr-none shadow-2xl border border-white/5' : 'text-gray-200 py-1.5 md:py-2.5'}`}>
                     {isEditing ? (
                         <div className="flex flex-col gap-3">
                             <textarea
@@ -60,12 +64,14 @@ const MessageItem = React.memo(({
                         </div>
                     ) : (
                         <div className={`${msg.role === 'ai' ? 'prose-ai' : ''} max-w-none`}>
-                            {(!msg.content || msg.content.trim() === "") && isStreaming ? (
-                                <div className="flex items-center gap-2 h-6 md:h-7">
+                            {(!msg.content || msg.content.trim() === "") && isStreaming && (!currentStep || currentStep === 'idle' || currentStep === 'answering') ? (
+                                // Hanya tampilkan titik-titik di bubble jika kita TIDAK sedang di step advanced
+                                // atau jika step-nya memang sudah 'answering' (di mana ThinkingStatus box biasanya sudah hilang)
+                                <div className="flex items-center gap-2 h-6 md:h-7 opacity-80">
                                     <div className="flex items-center gap-1.5">
-                                        <motion.div animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0 }} className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" style={{ backgroundColor: primaryColor }} />
-                                        <motion.div animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" style={{ backgroundColor: primaryColor }} />
-                                        <motion.div animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" style={{ backgroundColor: primaryColor }} />
+                                        <motion.div animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0 }} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryColor }} />
+                                        <motion.div animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryColor }} />
+                                        <motion.div animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryColor }} />
                                     </div>
                                 </div>
                             ) : (
@@ -136,7 +142,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [attachments, setAttachments] = useState<{ name: string, type: string, url: string }[]>([]);
     const { messages, setMessages, sendMessage, stopStream } = useChatStream();
-    const { isStreaming } = useAgentStore();
+    const { isStreaming, currentStep } = useAgentStore();
     const { primaryColor } = useThemeStore();
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -525,12 +531,6 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                 <path d="M22.282 11.976a4.43 4.43 0 0 0-.411-2.13 4.475 4.475 0 0 0-1.859-1.983c.046-.247.065-.499.056-.753-.01-.588-.173-1.16-.472-1.658a4.417 4.417 0 0 0-1.503-1.503 4.54 4.54 0 0 0-3.32-.472c-.247-.046-.499-.065-.753-.056a4.415 4.415 0 0 0-1.658.472 4.417 4.417 0 0 0-1.503 1.503 4.433 4.433 0 0 0-.411 2.13 4.476 4.476 0 0 0-1.841 1.983c-.046-.247-.066-.499-.056-.753.01-.588.173-1.16.471-1.658a4.417 4.417 0 0 0 1.503-1.503 4.54 4.54 0 0 0 3.321-.472c.247-.046.499-.065.753-.056.588.01 1.16.173 1.658.471a4.417 4.417 0 0 0 1.503 1.503 4.43 4.43 0 0 0 .411 2.13c-.046.247-.065.499-.056.753.011.588.173-1.16.472 1.658a4.417 4.417 0 0 0 1.503 1.503 4.54 4.54 0 0 0 3.32-.472c.247.045.499.065.753.056.588-.011 1.16-.174 1.658-.472a4.417 4.417 0 0 0 1.503-1.503c.298-.497.461-1.069.471-1.658a4.54 4.54 0 0 0-.056-.753zm-11.233-6.505a2.536 2.536 0 0 1 1.597-.132c.164.045.318.12.451.222l.142.11 2.115 3.664a.276.276 0 0 1-.093.385l-4.421 2.553a.276.276 0 0 1-.385-.093l-2.115-3.664a2.49 2.49 0 0 1-.225-1.198 2.527 2.527 0 0 1 1.198-2.115c.132-.077.279-.133.43-.166zm-4.782 5.394c.045-.164.12-.319.223-.451l.11-.142 2.115-3.664a.276.276 0 0 1 .385-.093l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664a2.49 2.49 0 0 1-1.198.225 2.53 2.53 0 0 1-2.115-1.198 2.536 2.536 0 0 1-.132-1.597.276.276 0 0 1 .223-.451zM6.438 18.53a2.536 2.536 0 0 1-1.597.132 2.54 2.54 0 0 1-1.198-2.115 2.49 2.49 0 0 1 .225-1.198l2.115-3.664a.276.276 0 0 1 .385-.093l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664c-.133.23-.318.431-.542.59a2.527 2.527 0 0 1-1.934.41l.132-1.597a.276.276 0 0 1-.091-.453zm6.505 1.702a2.536 2.536 0 0 1-1.597.132 2.527 2.527 0 0 1-1.649-2.337l-.011-4.231a.276.276 0 0 1 .276-.276l5.106.014a.276.276 0 0 1 .276.276v4.23c-.001.265-.054.527-.156.772a2.53 2.53 0 0 1-2.455 1.636l.21.014zm4.782-5.394c-.045.164-.12.319-.222.451l-.11.142-2.115 3.664a.276.276 0 0 1-.385.093l-4.421-2.553a.276.276 0 0 1-.093-.385l2.115-3.664a2.49 2.49 0 0 1 1.198-.225 2.53 2.53 0 0 1 2.115 1.198c.077.132.133.279.166.43l-.11.451zm1.313-1.832c-.133.076-.279.133-.43.166a.276.276 0 0 1-.223.451h-.001a1.26 1.26 0 0 1-1.597-.132 2.536 2.536 0 0 1-.542-.591 2.27 2.27 0 0 1-.413-.771 2.54 2.54 0 0 1 .411-1.936l2.115-3.664a.276.276 0 0 1 .385-.094l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664c-.133.23-.318.431-.542.59z" />
             </svg>
         ),
-        deepseek: (className: string) => (
-            <svg viewBox="0 0 1024 1024" className={className}>
-                <path fill="#4D6BFE" d="M512 0C229.2 0 0 229.2 0 512s229.2 512 512 512 512-229.2 512-512S794.8 0 512 0zm0 832c-176.7 0-320-143.3-320-320S335.3 192 512 192s320 143.3 320 320-143.3 320-320 320z" />
-                <path fill="#4D6BFE" d="M512 288c-123.7 0-224 100.3-224 224s100.3 224 224 224 224-100.3 224-224-100.3-224-224-224zm0 352c-70.7 0-128-57.3-128-128s57.3-128 128-128 128 57.3 128 128-57.3 128-128 128z" />
-            </svg>
-        ),
         kimi: (className: string) => (
             <svg viewBox="0 0 24 24" className={className} fill="#FF5C00">
                 <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.455 12.545c0 2.408-1.956 4.364-4.364 4.364s-4.364-1.956-4.364-4.364 1.956-4.364 4.364-4.364 4.364 1.956 4.364 4.364z" />
@@ -548,8 +548,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
     const agents = [
         { id: 'auto', name: 'Auto / Orbit Brain', icon: <Orbit className="w-6 h-6" style={{ color: primaryColor }} />, desc: 'Cepat & Seimbang' },
         { id: 'llama', name: 'Meta / Llama 3.3-70b', icon: BrandLogos.meta("w-6 h-6"), desc: 'Logika & Akurasi' },
-        { id: 'deepseek', name: 'DeepSeek / DeepSeek-V3', icon: BrandLogos.deepseek("w-6 h-6"), desc: 'Coding & Analitik' },
-        { id: 'qwen', name: 'Alibaba / Qwen 2.5 Next', icon: BrandLogos.qwen("w-6 h-6"), desc: 'Kreatif & Penulisan' },
+        { id: 'qwen', name: 'Alibaba / Qwen 2.5 Coder', icon: BrandLogos.qwen("w-6 h-6"), desc: 'Kreatif & Penulisan' },
         { id: 'kimi', name: 'Moonshot / Kimi K2.5', icon: BrandLogos.kimi("w-6 h-6"), desc: 'File & Memori Panjang' },
         { id: 'gpt', name: 'OpenAI / GPT-4o-Latest', icon: BrandLogos.openai("w-6 h-6"), desc: 'Performa Terbaik' }
     ];
@@ -701,6 +700,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                         isLast={i === messages.length - 1}
                                         extractArtifact={extractArtifact}
                                         setCurrentArtifact={setCurrentArtifact}
+                                        currentStep={currentStep}
                                     />
                                 ))}
                             </div>

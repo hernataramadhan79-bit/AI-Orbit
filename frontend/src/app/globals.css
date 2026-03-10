@@ -35,7 +35,9 @@
 
     /* Markdown Styles for AI Responses */
     .prose-ai {
-        @apply text-gray-200 leading-relaxed text-[15px];
+        @apply text-gray-200 leading-relaxed text-[15px] break-words;
+        overflow-wrap: break-word;
+        word-break: break-word;
         --accent-glow: color-mix(in srgb, var(--primary-color), transparent 85%);
     }
 

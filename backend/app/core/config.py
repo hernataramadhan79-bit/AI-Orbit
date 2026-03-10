@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -11,17 +12,17 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql://user:password@localhost:5432/ai_orbit"
 
     # AI Provider Keys
+    OPENAI_API_KEY: Optional[str] = None
     NVIDIA_API_KEY_GPT: str = "your-key-here"
-    NVIDIA_API_KEY_DEEPSEEK: str = "your-key-here"
     NVIDIA_API_KEY_LLAMA: str = "your-key-here"
     NVIDIA_API_KEY_QWEN: str = "your-key-here"
     NVIDIA_API_KEY_KIMI: str = "your-key-here"
     
     DEFAULT_MODEL_GPT: str = "meta/llama-3.1-405b-instruct"
-    DEFAULT_MODEL_DEEPSEEK: str = "deepseek-ai/deepseek-v3.2"
     DEFAULT_MODEL_LLAMA: str = "meta/llama-3.3-70b-instruct"
-    DEFAULT_MODEL_QWEN: str = "qwen/qwen3-next-80b-a3b-instruct"
+    DEFAULT_MODEL_QWEN: str = "qwen/qwen2.5-coder-32b-instruct"
     DEFAULT_MODEL_KIMI: str = "moonshotai/kimi-k2.5"
+    DEFAULT_MODEL_TURBO: str = "meta/llama-3.1-8b-instruct" # Model super cepat untuk sapaan
 
 
     # Tool API Keys
