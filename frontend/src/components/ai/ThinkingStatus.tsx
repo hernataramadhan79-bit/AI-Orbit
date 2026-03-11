@@ -14,10 +14,12 @@ import {
 
 // --- Model Display Names ---
 const MODEL_NAMES: Record<string, string> = {
-    gpt: 'GPT-4o Class',
-    llama: 'Llama 3.3-70B',
-    qwen: 'Qwen 2.5 Coder',
-    kimi: 'Kimi K2.5',
+    gpt: 'Llama 3.1',
+    claude: 'Llama 3.1',
+    reasoning: 'DeepSeek R1',
+    vision: 'Gemini Vision',
+    coder: 'Qwen Coder',
+    turbo: 'Gemini Flash',
     auto: 'Orbit Brain',
     orbit: 'Orbit Brain',
 };

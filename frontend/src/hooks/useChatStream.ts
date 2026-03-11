@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useAgentStore } from '../store/useAgentStore';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -21,16 +21,21 @@ export function useChatStream() {
     const { session } = useAuthStore();
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    // Keep ref in sync with state
-    const setMessagesWithRef = (update: Message[] | ((prev: Message[]) => Message[])) => {
+    // Keep ref in sync with state - Wrapped in useCallback to prevent infinite loops
+    const setMessagesWithRef = useCallback((update: Message[] | ((prev: Message[]) => Message[])) => {
         setMessages((prev) => {
             const next = typeof update === 'function' ? update(prev) : update;
             messagesRef.current = next;
             return next;
         });
-    };
+    }, [setMessages]);
 
-    const sendMessage = async (prompt: string, model: string = "gpt", attachments?: Attachment[], sessionId?: string, resumeFromIndex?: number) => {
+    const stopStream = useCallback(() => {
+        if (abortControllerRef.current) abortControllerRef.current.abort();
+        useAgentStore.setState({ isStreaming: false });
+    }, []);
+
+    const sendMessage = useCallback(async (prompt: string, model: string = "gpt", attachments?: Attachment[], sessionId?: string, resumeFromIndex?: number) => {
         stopStream();
         useAgentStore.setState({ isStreaming: true });
         useAgentStore.getState().setAgentStep('thinking', 'Memulai...', 'orbit');
@@ -158,12 +163,7 @@ export function useChatStream() {
         } finally {
             useAgentStore.setState({ isStreaming: false });
         }
-    };
-
-    const stopStream = () => {
-        if (abortControllerRef.current) abortControllerRef.current.abort();
-        useAgentStore.setState({ isStreaming: false });
-    };
+    }, [session?.access_token, setAgentStep, setMessagesWithRef, stopStream]);
 
     return { messages, setMessages: setMessagesWithRef, sendMessage, stopStream };
 }

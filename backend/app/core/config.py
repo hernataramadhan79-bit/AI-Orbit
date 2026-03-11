@@ -12,17 +12,20 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql://user:password@localhost:5432/ai_orbit"
 
     # AI Provider Keys
-    OPENAI_API_KEY: Optional[str] = None
-    NVIDIA_API_KEY_GPT: str = "your-key-here"
-    NVIDIA_API_KEY_LLAMA: str = "your-key-here"
-    NVIDIA_API_KEY_QWEN: str = "your-key-here"
-    NVIDIA_API_KEY_KIMI: str = "your-key-here"
+    OPENROUTER_API_KEY: str = "your-openrouter-key-here"
     
-    DEFAULT_MODEL_GPT: str = "meta/llama-3.1-405b-instruct"
-    DEFAULT_MODEL_LLAMA: str = "meta/llama-3.3-70b-instruct"
-    DEFAULT_MODEL_QWEN: str = "qwen/qwen2.5-coder-32b-instruct"
-    DEFAULT_MODEL_KIMI: str = "moonshotai/kimi-k2.5"
-    DEFAULT_MODEL_TURBO: str = "meta/llama-3.1-8b-instruct" # Model super cepat untuk sapaan
+    # Orbit Intelligence Slots (Powered by OpenRouter)
+    # Spesialisasi tugas masing-masing model:
+    # - REASONING: Matematika, logika kompleks, analisis mendalam
+    # - VISION: Analisis gambar, multimodal
+    # - CODING: Generate dan debug code
+    # - TURBO: Respons cepat untuk tugas ringan
+    DEFAULT_MODEL_GPT: str = "meta-llama/llama-3.1-8b-instruct"  # General Conversation
+    DEFAULT_MODEL_REASONING: str = "deepseek/deepseek-r1"  # Reasoning Specialist
+    DEFAULT_MODEL_VISION: str = "google/gemini-2.0-flash-001"  # Vision/Multimodal Specialist
+    DEFAULT_MODEL_CODER: str = "qwen/qwen-2.5-coder-32b-instruct"  # Coding Specialist
+    DEFAULT_MODEL_TURBO: str = "google/gemini-2.0-flash-001"  # Fast Response Specialist
+    DEFAULT_MODEL_CLAUDE: str = "meta-llama/llama-3.1-8b-instruct"  # Claude Alternative
 
 
     # Tool API Keys

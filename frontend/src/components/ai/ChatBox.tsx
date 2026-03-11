@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useChatStream } from '../../hooks/useChatStream';
 import { useAgentStore } from '../../store/useAgentStore';
-import { Send, Square, Paperclip, Image as ImageIcon, Mic, ChevronDown, Sparkles, Globe, Activity, PanelLeft, User, Copy, Check, Pencil, Orbit, Code, RotateCcw, Layout, Plus } from 'lucide-react';
+import { Send, Square, Paperclip, Image as ImageIcon, Mic, ChevronDown, Sparkles, Globe, Activity, PanelLeft, User, Copy, Check, Pencil, Orbit, Code, RotateCcw, Layout, Plus, FileText, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -48,7 +48,7 @@ const MessageItem = React.memo(({
                 </div>
             )}
             <div className={`relative min-w-0 max-w-[92%] sm:max-w-[85%] md:max-w-[75%] ${msg.role === 'user' ? '' : 'flex-1'}`}>
-                {msg.role === 'ai' && isStreaming && <ThinkingStatus isInline={true} />}
+                {/* Thinking status dihapus sesuai request */}
                 <div className={`text-[14px] md:text-[15px] leading-relaxed relative break-words overflow-hidden ${msg.role === 'user' ? 'bg-[#262626] text-gray-100 px-4 md:px-7 py-2.5 md:py-4 rounded-2xl md:rounded-[2rem] rounded-tr-none shadow-2xl border border-white/5' : 'text-gray-200 py-1.5 md:py-2.5'}`}>
                     {isEditing ? (
                         <div className="flex flex-col gap-3">
@@ -81,13 +81,43 @@ const MessageItem = React.memo(({
                     )}
 
                     {msg.attachments && msg.attachments.length > 0 && (
-                        <div className="mt-4 flex flex-wrap gap-2">
-                            {msg.attachments.map((file: any, idx: number) => (
-                                <div key={idx} className="flex items-center gap-2 bg-black/20 px-3 py-2 rounded-xl border border-white/5 text-[10px] md:text-xs">
-                                    <Paperclip className="w-3 h-3" />
-                                    <span className="truncate max-w-[150px]">{file.name}</span>
-                                </div>
-                            ))}
+                        <div className="mt-4 flex flex-wrap gap-3">
+                            {msg.attachments.map((file: any, idx: number) => {
+                                const isImage = file.type?.startsWith('image/');
+                                const isPDF = file.type === 'application/pdf' || file.name?.endsWith('.pdf');
+                                const isDoc = file.name?.endsWith('.doc') || file.name?.endsWith('.docx');
+
+                                return (
+                                    <div
+                                        key={idx}
+                                        className={`relative group overflow-hidden rounded-xl border border-white/10 ${isImage ? 'w-24 h-24' : 'bg-white/5 px-4 py-3'}`}
+                                    >
+                                        {isImage && file.url ? (
+                                            <img
+                                                src={file.url}
+                                                alt={file.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isPDF ? 'bg-red-500/20 text-red-400' : isDoc ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                                                    {isPDF ? <span className="text-xs font-bold">PDF</span> :
+                                                        isDoc ? <span className="text-xs font-bold">DOC</span> :
+                                                            <FileText className="w-5 h-5" />}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs font-medium text-white truncate max-w-[150px]">{file.name}</span>
+                                                    <span className="text-[10px] text-gray-500 capitalize">{file.type?.split('/')[1] || 'file'}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {/* Hover overlay untuk klik preview */}
+                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                                            <Eye className="w-5 h-5 text-white" />
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
@@ -114,10 +144,11 @@ const MessageItem = React.memo(({
                                             const artifact = extractArtifact(msg.content, i);
                                             if (artifact) setCurrentArtifact(artifact);
                                         }}
-                                        className="p-1.5 md:p-2 hover:bg-white/5 rounded-lg transition-all text-blue-400"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-all text-blue-400 text-xs font-medium"
                                         title="Buka Panel Preview"
                                     >
-                                        <Layout className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                                        <Layout className="w-3.5 h-3.5" />
+                                        <span className="hidden md:inline">Preview</span>
                                     </button>
                                 )}
                                 {isLast && (
@@ -153,6 +184,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
     const [showLimitModal, setShowLimitModal] = useState(false);
 
     const prevSessionIdRef = useRef<string | null>(null);
+    const isInitialMount = useRef(true);
 
     // Sync demo usage from localStorage
     useEffect(() => {
@@ -161,6 +193,17 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
             setDemoUsage(count);
         }
     }, [user]);
+
+    // Reset agent state when switching sessions - using ref to prevent infinite loop
+    const prevSessionIdForReset = useRef<string | null>(null);
+    useEffect(() => {
+        // Only trigger reset once per session change
+        if (sessionId && sessionId !== prevSessionIdForReset.current) {
+            prevSessionIdForReset.current = sessionId;
+            // Reset agent store state for clean slate
+            useAgentStore.getState().resetStream();
+        }
+    }, [sessionId]);
 
     const incrementDemoCount = () => {
         const newCount = demoUsage + 1;
@@ -176,30 +219,61 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
     const dropdownRef = useRef<HTMLDivElement>(null);
     const [currentArtifact, setCurrentArtifact] = useState<Artifact | null>(null);
 
-    // --- Artifact detection: extract first code block from AI message ---
+    // --- Artifact detection: extract best code block or document ---
     const extractArtifact = useCallback((content: string, msgIdx: number): Artifact | null => {
-        const codeMatch = content.match(/```(\w*)\n([\s\S]*?)```/);
-        if (codeMatch) {
-            const lang = codeMatch[1] || 'code';
-            const code = codeMatch[2];
-            const isHtml = lang === 'html';
+        if (!content) return null;
+
+        // 1. Detect ALL Code Blocks
+        const codeBlockRegex = /```(\w*)\s*\n?([\s\S]*?)\n?```/g;
+        const matches = Array.from(content.matchAll(codeBlockRegex));
+
+        if (matches.length > 0) {
+            // Priority: Find HTML block first for web preview, then others
+            let bestMatch = matches.find(m => m[1]?.toLowerCase() === 'html');
+            if (!bestMatch) bestMatch = matches[0]; // Fallback to first block
+
+            const lang = (bestMatch[1] || 'code').toLowerCase();
+            const code = bestMatch[2].trim();
+
+            // Try to find a title
+            let title = `Kode ${lang.toUpperCase()}`;
+            if (lang === 'html') {
+                title = 'Web Preview';
+                const titleMatch = code.match(/<title>(.*?)<\/title>/i);
+                if (titleMatch) title = titleMatch[1];
+            } else {
+                const firstLine = code.split('\n')[0].trim();
+                if (firstLine.startsWith('//') || firstLine.startsWith('#') || firstLine.startsWith('/*')) {
+                    title = firstLine.replace(/^(\/\/|#|\/\*|\*\/)\s*/, '').slice(0, 40);
+                }
+            }
+
+            // Create a stable ID based on index and content hash (simple)
+            const contentHash = code.length + code.slice(0, 20);
+            const stableId = `artifact-${msgIdx}-${lang}-${contentHash}`;
+
             return {
-                id: `artifact-${msgIdx}-${Date.now()}`,
-                type: isHtml ? 'html' : 'code',
-                title: isHtml ? 'HTML Preview' : `Kode ${lang.toUpperCase()}`,
+                id: stableId,
+                type: lang === 'html' ? 'html' : lang === 'mermaid' ? 'mermaid' : 'code',
+                title: title,
                 content: code,
                 language: lang,
             };
         }
-        // Fallback: long markdown
-        if (content.length > 800 && content.includes('#')) {
+
+        // 2. Detect Document (Long Markdown with Headings)
+        if ((content.includes('# ') || content.includes('## ')) && content.length > 500) {
+            const headingMatch = content.match(/^#+\s+(.*)/m);
+            const title = headingMatch ? headingMatch[1] : 'Dokumen';
+
             return {
-                id: `artifact-${msgIdx}-md`,
+                id: `article-${msgIdx}`,
                 type: 'markdown',
-                title: 'Dokumen',
-                content,
+                title: title,
+                content: content,
             };
         }
+
         return null;
     }, []);
 
@@ -313,45 +387,72 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
 
     // Load initial messages only when sessionId explicitly changes
     useEffect(() => {
-        const fetchInitialMessages = async () => {
-            if (sessionId !== prevSessionIdRef.current) {
-                // 1. Try initialMessages from props/localStorage
-                if (initialMessages && initialMessages.length > 0) {
-                    setMessages(initialMessages);
-                }
-                // 2. Fallback: If logged in and empty local, fetch from Cloud ONLY for this session
-                else if (user && isSupabaseEnabled && sessionId) {
-                    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-                    if (uuidRegex.test(sessionId)) {
-                        try {
-                            const { data, error } = await supabase
-                                .from('messages')
-                                .select('role, content, attachments')
-                                .eq('conversation_id', sessionId)
-                                .order('created_at', { ascending: true });
+        // Skip on initial mount
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            prevSessionIdRef.current = sessionId;
+            return;
+        }
 
-                            if (error) throw error;
-                            if (data && data.length > 0) {
-                                setMessages(data as any);
-                            } else {
-                                setMessages([]);
-                            }
-                        } catch (err) {
-                            console.error("☁️ Orbit Cloud: Failed to fetch messages for session", err);
-                            setMessages([]);
-                        }
-                    } else {
-                        setMessages([]);
+        // Only proceed if sessionId actually changed
+        if (!sessionId || sessionId === prevSessionIdRef.current) {
+            return;
+        }
+
+        // Update ref IMMEDIATELY to prevent parallel runs from renders during the async fetch
+        prevSessionIdRef.current = sessionId;
+
+        const fetchInitialMessages = async () => {
+            // Gunakan cleanup untuk mencegah race condition dari fetch lama
+            const currentSessionId = sessionId;
+
+            // 1. First, immediately clear messages for instant feedback
+            setMessages([]);
+
+            // 2. Cek di local storage dulu (sangat cepat)
+            try {
+                const localSaved = localStorage.getItem('ai-orbit-history');
+                const history = localSaved ? JSON.parse(localSaved) : [];
+                const localSession = history.find((h: any) => h.id === sessionId);
+
+                if (localSession && localSession.messages && localSession.messages.length > 0) {
+                    // Double check we're still on the same session
+                    if (currentSessionId === sessionId) {
+                        setMessages(localSession.messages);
                     }
-                } else {
-                    setMessages([]);
+                } else if (initialMessages && initialMessages.length > 0) {
+                    if (currentSessionId === sessionId) {
+                        setMessages(initialMessages);
+                    }
                 }
-                prevSessionIdRef.current = sessionId;
+                // else: keep empty messages for new chat
+            } catch (err) {
+                console.error("Failed to parse local history:", err);
+            }
+
+            // 3. Jika user login, fetch yang paling fresh dari Cloud
+            if (user && isSupabaseEnabled && currentSessionId === sessionId) {
+                const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                if (uuidRegex.test(sessionId)) {
+                    try {
+                        const { data, error } = await supabase
+                            .from('messages')
+                            .select('role, content, attachments')
+                            .eq('conversation_id', sessionId)
+                            .order('created_at', { ascending: true });
+
+                        if (!error && data && data.length > 0 && currentSessionId === sessionId) {
+                            setMessages(data as any);
+                        }
+                    } catch (err) {
+                        console.error("☁️ Orbit Cloud: Failed to fetch messages", err);
+                    }
+                }
             }
         };
 
         fetchInitialMessages();
-    }, [sessionId, initialMessages, user]);
+    }, [sessionId, initialMessages, user, setMessages]);
 
     // --- OPTIMIZED SYNC: Persist messages to localStorage & Cloud ---
     useEffect(() => {
@@ -424,6 +525,31 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     }, [messages, isStreaming]);
+
+    const lastOpenedArtifactIdRef = useRef<string | null>(null);
+    const wasStreamingRef = useRef(false);
+
+    // Auto-open artifacts when generation finishes
+    useEffect(() => {
+        // Only trigger if we WERE streaming and now we STOPPED
+        if (wasStreamingRef.current && !isStreaming && messages.length > 0) {
+            const lastMsg = messages[messages.length - 1];
+            if (lastMsg.role === 'ai') {
+                const artifact = extractArtifact(lastMsg.content, messages.length - 1);
+                // Only auto-open if it's a new artifact ID we haven't handled yet
+                if (artifact && artifact.id !== lastOpenedArtifactIdRef.current) {
+                    setCurrentArtifact(artifact);
+                    lastOpenedArtifactIdRef.current = artifact.id;
+                }
+            }
+        }
+        // Update the ref for the next render
+        wasStreamingRef.current = isStreaming;
+    }, [isStreaming, messages, extractArtifact]);
+
+    const handleCloseArtifact = () => {
+        setCurrentArtifact(null);
+    };
 
     // Auto resize textarea
     const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -521,36 +647,41 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
 
     // High-Fidelity Brand Logos
     const BrandLogos = {
-        meta: (className: string) => (
-            <svg viewBox="0 0 24 24" className={className} fill="none" stroke="#0668E1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 10.174c1.11 -1.458 2.22 -2.174 3.333 -2.174c2.21 0 4 1.79 4 4s-1.79 4 -4 4c-1.113 0 -2.223 -.716 -3.333 -2.174c-1.11 1.458 -2.22 2.174 -3.333 2.174c-2.21 0 -4 -1.79 -4 -4s1.79 -4 4 -4c1.11 0 2.22 .716 3.333 2.174z" />
+        claude: (className: string) => (
+            <svg viewBox="0 0 24 24" className={className} fill="#D97757">
+                <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+            </svg>
+        ),
+        gemini: (className: string) => (
+            <svg viewBox="0 0 24 24" className={className} fill="#4285F4">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" />
             </svg>
         ),
         openai: (className: string) => (
             <svg viewBox="0 0 24 24" className={className} fill="#10A37F">
-                <path d="M22.282 11.976a4.43 4.43 0 0 0-.411-2.13 4.475 4.475 0 0 0-1.859-1.983c.046-.247.065-.499.056-.753-.01-.588-.173-1.16-.472-1.658a4.417 4.417 0 0 0-1.503-1.503 4.54 4.54 0 0 0-3.32-.472c-.247-.046-.499-.065-.753-.056a4.415 4.415 0 0 0-1.658.472 4.417 4.417 0 0 0-1.503 1.503 4.433 4.433 0 0 0-.411 2.13 4.476 4.476 0 0 0-1.841 1.983c-.046-.247-.066-.499-.056-.753.01-.588.173-1.16.471-1.658a4.417 4.417 0 0 0 1.503-1.503 4.54 4.54 0 0 0 3.321-.472c.247-.046.499-.065.753-.056.588.01 1.16.173 1.658.471a4.417 4.417 0 0 0 1.503 1.503 4.43 4.43 0 0 0 .411 2.13c-.046.247-.065.499-.056.753.011.588.173-1.16.472 1.658a4.417 4.417 0 0 0 1.503 1.503 4.54 4.54 0 0 0 3.32-.472c.247.045.499.065.753.056.588-.011 1.16-.174 1.658-.472a4.417 4.417 0 0 0 1.503-1.503c.298-.497.461-1.069.471-1.658a4.54 4.54 0 0 0-.056-.753zm-11.233-6.505a2.536 2.536 0 0 1 1.597-.132c.164.045.318.12.451.222l.142.11 2.115 3.664a.276.276 0 0 1-.093.385l-4.421 2.553a.276.276 0 0 1-.385-.093l-2.115-3.664a2.49 2.49 0 0 1-.225-1.198 2.527 2.527 0 0 1 1.198-2.115c.132-.077.279-.133.43-.166zm-4.782 5.394c.045-.164.12-.319.223-.451l.11-.142 2.115-3.664a.276.276 0 0 1 .385-.093l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664a2.49 2.49 0 0 1-1.198.225 2.53 2.53 0 0 1-2.115-1.198 2.536 2.536 0 0 1-.132-1.597.276.276 0 0 1 .223-.451zM6.438 18.53a2.536 2.536 0 0 1-1.597.132 2.54 2.54 0 0 1-1.198-2.115 2.49 2.49 0 0 1 .225-1.198l2.115-3.664a.276.276 0 0 1 .385-.093l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664c-.133.23-.318.431-.542.59a2.527 2.527 0 0 1-1.934.41l.132-1.597a.276.276 0 0 1-.091-.453zm6.505 1.702a2.536 2.536 0 0 1-1.597.132 2.527 2.527 0 0 1-1.649-2.337l-.011-4.231a.276.276 0 0 1 .276-.276l5.106.014a.276.276 0 0 1 .276.276v4.23c-.001.265-.054.527-.156.772a2.53 2.53 0 0 1-2.455 1.636l.21.014zm4.782-5.394c-.045.164-.12.319-.222.451l-.11.142-2.115 3.664a.276.276 0 0 1-.385.093l-4.421-2.553a.276.276 0 0 1-.093-.385l2.115-3.664a2.49 2.49 0 0 1 1.198-.225 2.53 2.53 0 0 1 2.115 1.198c.077.132.133.279.166.43l-.11.451zm1.313-1.832c-.133.076-.279.133-.43.166a.276.276 0 0 1-.223.451h-.001a1.26 1.26 0 0 1-1.597-.132 2.536 2.536 0 0 1-.542-.591 2.27 2.27 0 0 1-.413-.771 2.54 2.54 0 0 1 .411-1.936l2.115-3.664a.276.276 0 0 1 .385-.094l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664c-.133.23-.318.431-.542.59z" />
+                <path d="M22.282 11.976a4.43 4.43 0 0 0-.411-2.13 4.475 4.475 0 0 0-1.859-1.983c.046-.247.065-.499.056-.753-.01-.588-.173-1.16-.472-1.658a4.417 4.417 0 0 0-1.503-1.503 4.54 4.54 0 0 0-3.32-.472c-.247-.046-.499-.065-.753-.056a4.415 4.415 0 0 0-1.658.472 4.417 4.417 0 0 0-1.503 1.503 4.433 4.433 0 0 0-.411 2.13 4.476 4.476 0 0 0-1.841 1.983c-.046-.247-.066-.499-.056-.753.01-.588.173-1.16.471-1.658a4.417 4.417 0 0 0 1.503-1.503 4.54 4.54 0 0 0 3.321-.472c.247-.046.499-.065.753-.056.588.01 1.16.173 1.658.471a4.417 4.417 0 0 0 1.503 1.503 4.43 4.43 0 0 0 .411 2.13c-.046.247-.065.499-.056.753.011.588.173-1.16.472 1.658a4.417 4.417 0 0 0 1.503 1.503 4.54 4.54 0 0 0 3.32-.472c.247.045.499.065.753.056.588-.011 1.16-.174 1.658-.472a4.417 4.417 0 0 0 1.503-1.503c.298-.497.461-1.069.471-1.658a4.54 4.54 0 0 0-.056-.753zm-11.233-6.505a2.536 2.536 0 0 1 1.597-.132c.164.045.318.12.451.222l.142.11 2.115 3.664a.276.276 0 0 1-.093.385l-4.421 2.553a.276.276 0 0 1-.385-.093l-2.115-3.664a2.49 2.49 0 0 1-.225-1.198 2.527 2.527 0 0 1 1.198-2.115c.132-.077.279-.133.43-.166zm-4.782 5.394c.045-.164.12-.319.223-.451l.11-.142 2.115-3.664a.276.276 0 0 1 .385-.093l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664a2.49 2.49 0 0 1-1.198.225 2.53 2.53 0 0 1-2.115-1.198 2.536 2.536 0 0 1-.132-1.597.276.276 0 0 1 .223-.451zM6.438 18.53a2.536 2.536 0 0 1-1.597.132 2.54 2.54 0 0 1-1.198-2.115 2.49 2.49 0 0 1 .225-1.198l2.115-3.664a.276.276 0 0 1 .385-.093l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664c-.133.23-.318.431-.542.59a2.527 2.527 0 0 1-1.934.41l.132-1.597a.276.276 0 0 1-.091-.453zm6.505 1.702a2.536 2.536 0 0 1-1.597.132 2.527 2.527 0 0 1-1.649-2.337l-.011-4.231a.276.276 0 0 1 .276-.276l5.106.014a.276.276 0 0 1 .276.276v4.23c-.001.265-.054.527-.156.772a2.53 2.53 0 0 1-2.455 1.636l.21.014zm4.782-5.394c-.045.164-.12.319-.222.451l-.11.142-2.115 3.664a.276.276 0 0 1-.385.093l-4.421-2.553a.276.276 0 0 1-.093-.385l2.115-3.664a2.49 2.49 0 0 1 1.198-.225 2.53 2.53 0 0 1 2.115 1.198c.077.132.133.279.166.43l-.11.451zm1.313-1.832c-.133.076-.279.133-.43.166a.276.276 0 0 1-.223.451h-.001a1.26 1.26 0 0 1-1.597-.132 2.536 2.536 0 0 1-.542-.591 2.27 2.27 0 0 1-.771-.771a2.54 2.54 0 0 1 .411-1.936l2.115-3.664a.276.276 0 0 1 .385-.094l4.421 2.553a.276.276 0 0 1 .093.385l-2.115 3.664c-.133.23-.318.431-.542.59z" />
             </svg>
         ),
-        kimi: (className: string) => (
-            <svg viewBox="0 0 24 24" className={className} fill="#FF5C00">
-                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.455 12.545c0 2.408-1.956 4.364-4.364 4.364s-4.364-1.956-4.364-4.364 1.956-4.364 4.364-4.364 4.364 1.956 4.364 4.364z" />
-                <path d="M12 8.727c-1.806 0-3.273 1.467-3.273 3.273s1.467 3.273 3.273 3.273 3.273-1.467 3.273-3.273-1.467-3.273-3.273-3.273zm1.091 4.364h-2.182v-2.182h2.182v2.182z" />
+        deepseek: (className: string) => (
+            <svg viewBox="0 0 24 24" className={className} fill="#4D6BFE">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
         ),
         qwen: (className: string) => (
             <svg viewBox="0 0 24 24" className={className} fill="#8A2BE2">
                 <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zm0 18.545c-3.609 0-6.545-2.936-6.545-6.545S8.391 5.455 12 5.455s6.545 2.936 6.545 6.545-2.936 6.545-6.545 6.545z" />
-                <path d="M12 8.727c-1.806 0-3.273 1.467-3.273 3.273s1.467 3.273 3.273 3.273 3.273-1.467 3.273-3.273-1.467-3.273-3.273-3.273zm0 4.364c-.603 0-1.091-.488-1.091-1.091s.488-1.091 1.091-1.091 1.091.488 1.091 1.091-.488 1.091-1.091 1.091z" />
+                <path d="M12 8.727c-1.806 0-3.273 1.467-3.273 3.273s1.467 3.273 3.273 3.273 3.273-1.467 3.273-3.273-1.467-3.273-3.273-3.273zm0 4.364c-.603 0-1.091-.488-1.091-1.091s.488-1.091 1.091-1.091 1.091.488 1.091 1.091-.488 1.091-1.091-1.091z" />
             </svg>
         )
     };
 
     const agents = [
-        { id: 'auto', name: 'Auto / Orbit Brain', icon: <Orbit className="w-6 h-6" style={{ color: primaryColor }} />, desc: 'Cepat & Seimbang' },
-        { id: 'llama', name: 'Meta / Llama 3.3-70b', icon: BrandLogos.meta("w-6 h-6"), desc: 'Logika & Akurasi' },
-        { id: 'qwen', name: 'Alibaba / Qwen 2.5 Coder', icon: BrandLogos.qwen("w-6 h-6"), desc: 'Kreatif & Penulisan' },
-        { id: 'kimi', name: 'Moonshot / Kimi K2.5', icon: BrandLogos.kimi("w-6 h-6"), desc: 'File & Memori Panjang' },
-        { id: 'gpt', name: 'OpenAI / GPT-4o-Latest', icon: BrandLogos.openai("w-6 h-6"), desc: 'Performa Terbaik' }
+        { id: 'auto', name: 'Auto / Orbit Brain', icon: <Orbit className="w-6 h-6" style={{ color: primaryColor }} />, desc: 'Mode Cerdas (Routing Otomatis)' },
+        { id: 'reasoning', name: 'DeepSeek R1', icon: BrandLogos.deepseek("w-6 h-6"), desc: 'Spesialis: Matematika, Logika, Analisis' },
+        { id: 'vision', name: 'Gemini Vision', icon: BrandLogos.gemini("w-6 h-6"), desc: 'Spesialis: Analisis Gambar & Multimodal' },
+        { id: 'coder', name: 'Qwen Coder', icon: BrandLogos.qwen("w-6 h-6"), desc: 'Spesialis: Coding & Debugging' },
+        { id: 'turbo', name: 'Gemini Flash', icon: BrandLogos.gemini("w-6 h-6"), desc: 'Spesialis: Respons Cepat & Ringan' },
+        { id: 'gpt', name: 'Llama 3.1', icon: BrandLogos.claude("w-6 h-6"), desc: 'Spesialis: Percakapan General' }
     ];
 
 
@@ -757,7 +888,7 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
                                         <div className="relative flex items-center justify-center w-6 h-6">
                                             {agents.find(a => a.name === selectedAgent)?.icon}
                                         </div>
-                                        <span className="hidden md:inline tracking-tight">{selectedAgent.split(' / ')[1]}</span>
+                                        <span className="hidden md:inline tracking-tight">{selectedAgent.split(' / ')[1] || selectedAgent}</span>
                                         <ChevronDown className={`w-3.5 h-3.5 opacity-50 hidden md:inline transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
                                     </button>
 
@@ -940,8 +1071,8 @@ export default function ChatBox({ isSidebarOpen, toggleSidebar, sessionId, initi
             {/* Artifact Side Panel */}
             <ArtifactPanel
                 artifact={currentArtifact}
-                onClose={() => setCurrentArtifact(null)}
+                onClose={handleCloseArtifact}
             />
-        </div >
+        </div>
     );
 }

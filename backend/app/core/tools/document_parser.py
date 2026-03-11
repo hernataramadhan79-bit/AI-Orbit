@@ -22,8 +22,19 @@ def parse_file(filename: str, content: bytes) -> Optional[str]:
                 reader = PyPDF2.PdfReader(io.BytesIO(content))
                 text = ""
                 for page in reader.pages:
-                    text += page.extract_text() + "\n"
-                return text.strip()
+                    page_text = page.extract_text()
+                    if page_text:
+                        text += page_text + "\n"
+                # Jika PyPDF2 gagal ekstrak teks, coba pdfplumber
+                if not text.strip():
+                    try:
+                        import pdfplumber
+                        with pdfplumber.open(io.BytesIO(content)) as pdf:
+                            for page in pdf.pages:
+                                text += page.extract_text() or ""
+                    except ImportError:
+                        pass
+                return text.strip() if text.strip() else None
             except ImportError:
                 return None
         
@@ -32,7 +43,13 @@ def parse_file(filename: str, content: bytes) -> Optional[str]:
                 import docx
                 doc = docx.Document(io.BytesIO(content))
                 text = "\n".join(para.text for para in doc.paragraphs if para.text)
-                return text.strip()
+                # Juga ekstrak dari tabel jika ada
+                for table in doc.tables:
+                    for row in table.rows:
+                        row_text = " | ".join(cell.text for cell in row.cells)
+                        if row_text.strip():
+                            text += "\n" + row_text
+                return text.strip() if text.strip() else None
             except ImportError:
                 return None
         

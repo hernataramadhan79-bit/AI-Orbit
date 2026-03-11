@@ -122,7 +122,8 @@ class DocumentStore:
                 print(f"WARNING: Gagal load embedder: {e}")
         return self._embed_fn
 
-    def _chunk_text(self, text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
+    def _chunk_text(self, text: str, chunk_size: int = 800, overlap: int = 100) -> list[str]:
+        """Pecah teks menjadi chunk yang lebih besar untuk konteks yang lebih baik."""
         words = text.split()
         chunks = []
         for i in range(0, len(words), chunk_size - overlap):

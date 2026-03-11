@@ -22,28 +22,33 @@ class RouterDecision:
 # ─────────────────────────────────────────────
 MODEL_PROFILES = {
     "gpt": {
-        "name": "Llama 3.1-405B",
-        "strengths": ["general", "chat", "summarize", "translate", "explain"],
+        "name": "Llama 3.1 8B (General)",
+        "strengths": ["general", "chat", "summarize", "translate", "explain", "conversation"],
         "max_score": 10,
     },
-    "llama": {
-        "name": "Llama 3.3-70B",
-        "strengths": ["vision", "image", "photo", "screenshot", "analyze image"],
+    "claude": {
+        "name": "Llama 3.1 8B",
+        "strengths": ["creative drafting", "complex logic", "nuanced conversation"],
         "max_score": 10,
     },
-    "qwen": {
-        "name": "Qwen 2.5-Next",
-        "strengths": ["coding", "programming", "script", "function", "build", "develop", "implement", "web", "app"],
+    "vision": {
+        "name": "Gemini 2.0 Flash Vision (Vision Specialist)",
+        "strengths": ["vision", "image", "photo", "screenshot", "analyze image", "multimodal", "gambar", "foto"],
         "max_score": 10,
     },
-    "kimi": {
-        "name": "Kimi K2.5",
-        "strengths": ["long document", "pdf", "paper", "research", "analyze", "math", "reasoning", "proof", "calculation", "complex problem"],
+    "coder": {
+        "name": "Qwen 2.5 Coder (Coding Specialist)",
+        "strengths": ["coding", "programming", "script", "function", "build", "develop", "implement", "web", "app", "kode", "debug"],
+        "max_score": 10,
+    },
+    "reasoning": {
+        "name": "DeepSeek R1 (Reasoning Specialist)",
+        "strengths": ["long document", "pdf", "paper", "research", "analyze", "math", "reasoning", "proof", "calculation", "complex problem", "analisis"],
         "max_score": 10,
     },
     "turbo": {
-        "name": "Orbit Turbo (Instant)",
-        "strengths": ["greeting", "small talk", "fast", "short"],
+        "name": "Gemini 2.0 Flash (Fast Response)",
+        "strengths": ["greeting", "small talk", "fast", "short", "sapa"],
         "max_score": 10,
     }
 }
@@ -79,6 +84,7 @@ DEBUG_MED = [
 
 # Long/complex document or reasoning — khusus Kimi
 REASONING_HIGH = [
+    r"\b(buatkan\s+dokumen|buatkan\s+artikel|buatkan\s+paper|buatkan\s+jurnal)\b",
     r"\b(analisis\s+mendalam|deep\s+analysis|paper|research|jurnal|journal|tesis|thesis|riset)\b",
     r"\b(hitung|kalkulasi|matematika|persamaan\s+diferensial|integral|derivatif|calculus|statistics|probabilitas)\b",
     r"\b(proof|membuktikan|pembuktian|logika\s+formal|predicate\s+logic)\b",
@@ -149,10 +155,15 @@ def route(
     print(f"DEBUG: Router - Prompt: '{prompt[:30]}...' WordCount: {word_count} GScore: {greeting_score}")
     
     # Sangat pendek atau sapaan = Langsung Turbo (Instant Response)
-    if greeting_score > 4.0 or (word_count <= 3 and not has_images and not has_docs):
+    # Kata kunci pembuatan kode/aplikasi
+    is_code_request = re.search(r"\b(kode|program|script|aplikasi|app|website|situs|koding|coding|buatkan\s+kode|tuliskan\s+kode)\b", prompt, re.IGNORECASE)
+    is_creation_request = re.search(r"\b(buatkan|bikin|generate|tuliskan|create|build|rencanakan|strategi|bagaimana|jelaskan|analisis)\b", prompt, re.IGNORECASE)
+    
+    # Ambang batas diperketat: Jika kata > 2 atau ada request creation, hindari Turbo
+    if (greeting_score > 4.5 or (word_count <= 2 and not has_images and not has_docs)) and not is_creation_request and not is_code_request:
         return RouterDecision(
             model="turbo",
-            reasoning="Sapaan/percakapan singkat terdeteksi. Menggunakan jalur Turbo.",
+            reasoning="Sapaan/percakapan sangat singkat terdeteksi. Menggunakan jalur Turbo.",
             confidence=1.0,
             signals=["fast-greeting-path"]
         )
@@ -162,22 +173,22 @@ def route(
 
     # ── 2. VISION & FILES ──────────────────────────────────────────────
     if has_images:
-        scores["llama"] += 9.0
-        all_signals["llama"].append("has-image-attachment")
+        scores["vision"] += 9.0
+        all_signals["vision"].append("has-image-attachment")
         s, sig = _score_pattern(prompt, VISION_HIGH, 3.0)
-        scores["llama"] += s
-        all_signals["llama"].extend(sig)
+        scores["vision"] += s
+        all_signals["vision"].extend(sig)
 
     if has_docs:
-        scores["kimi"] += 6.0
-        all_signals["kimi"].append("has-document-attachment")
+        scores["reasoning"] += 6.0
+        all_signals["reasoning"].append("has-document-attachment")
 
     # ── 3. INTENT SCORING ───────────────────────────────────────────────
-    # Coding & Development (Qwen 2.5-Next)
+    # Coding & Development (Qwen 2.5 Coder)
     code_s1, code_sig1 = _score_pattern(prompt, CODING_HIGH, 5.0)
     code_s2, code_sig2 = _score_pattern(prompt, CODING_MED, 2.0)
-    scores["qwen"] += code_s1 + code_s2
-    all_signals["qwen"].extend(code_sig1 + code_sig2)
+    scores["coder"] += code_s1 + code_s2
+    all_signals["coder"].extend(code_sig1 + code_sig2)
 
     # Debugging & Architecture (Llama 405B / GPT Profil)
     debug_s1, debug_sig1 = _score_pattern(prompt, DEBUG_HIGH, 6.0)
@@ -186,11 +197,11 @@ def route(
     all_signals["gpt"].extend(debug_sig1 + debug_sig2)
     # Llama 405B menangani logika berat yang sebelumnya ada di DeepSeek
 
-    # Reasoning, Math & Analysis (Kimi)
+    # Reasoning, Math & Analysis (DeepSeek R1)
     reason_s1, reason_sig1 = _score_pattern(prompt, REASONING_HIGH, 5.0)
     reason_s2, reason_sig2 = _score_pattern(prompt, REASONING_MED, 2.0)
-    scores["kimi"] += reason_s1 + reason_s2
-    all_signals["kimi"].extend(reason_sig1 + reason_sig2)
+    scores["reasoning"] += reason_s1 + reason_s2
+    all_signals["reasoning"].extend(reason_sig1 + reason_sig2)
 
     # ── 4. WINNER SELECTION ───────────────────────────────────────────
     best_model = max(scores, key=lambda m: scores[m])

@@ -32,7 +32,7 @@ async def startup_event():
     """Inisialisasi semua tools saat server mulai."""
     from app.core.tools.voice import init_voice
     init_voice(settings.ELEVENLABS_API_KEY)
-    print(f"🚀 AI Orbit Backend started. Tools initialized.")
+    print(f"AI Orbit Backend started. Tools initialized.")
 
 # Atur CORS untuk Frontend
 app.add_middleware(

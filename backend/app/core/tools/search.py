@@ -66,13 +66,21 @@ class WebSearchTool:
 
 # Fungsi helper untuk deteksi apakah query butuh pencarian web
 SEARCH_TRIGGERS = [
-    "terbaru", "sekarang", "hari ini", "minggu ini", "bulan ini",
-    "berita", "harga", "kurs", "saham", "update", "terkini",
+    # Indonesian triggers
+    "terbaru", "sekarang", "hari ini", "minggu ini", "bulan ini", "tahun ini",
+    "berita", "harga", "kurs", "saham", "update", "terkini", "informasi",
+    "cuaca", "weather", "laporkan", "siapa", "apa itu", "berapakah",
+    "cari", "cari di web", "pencarian", "google", "wikipedia",
+    # English triggers
     "latest", "current", "today", "news", "price", "market",
-    "2024", "2025", "2026", "cuaca", "weather",
+    "2024", "2025", "2026", "who is", "what is", "how to", "search",
+    "find", "lookup", "查", "最新", "新闻",
 ]
 
 def needs_web_search(prompt: str) -> bool:
     """Deteksi apakah pertanyaan membutuhkan pencarian web real-time."""
     lower = prompt.lower()
-    return any(trigger in lower for trigger in SEARCH_TRIGGERS)
+    # Juga trigger jika ada kata tanya yang mungkin membutuhkan info terkini
+    question_words = ["siapa", "apa", "bagaimana", "kenapa", "kapan", "di mana", "why", "what", "how", "when", "where", "who"]
+    has_question = any(q in lower for q in question_words)
+    return any(trigger in lower for trigger in SEARCH_TRIGGERS) or (has_question and len(prompt.split()) < 10)

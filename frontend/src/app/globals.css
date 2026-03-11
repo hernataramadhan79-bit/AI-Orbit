@@ -118,4 +118,25 @@
     .prose-ai hr {
         @apply border-white/10 my-10;
     }
+
+    /* Typing cursor animation */
+    .typing-cursor::after {
+        content: '|';
+        animation: blink 1s step-start infinite;
+        color: var(--primary-color);
+        font-weight: bold;
+        margin-left: 2px;
+    }
+
+    @keyframes blink {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0;
+        }
+    }
 }

@@ -24,14 +24,6 @@ venv/
 .venv/
 ENV/
 
-# Node
-node_modules/
-.next/
-out/
-build/
-.DS_Store
-*.pem
-
 # Env
 .env
 .env.local
@@ -43,8 +35,17 @@ build/
 # Database / AI
 chat_history.json
 data/chroma/
-uploads/*
-!uploads/.gitkeep
+**/uploads/
+!**/uploads/.gitkeep
+
+# Node / TypeScript
+node_modules/
+.next/
+out/
+build/
+.DS_Store
+*.pem
+*.tsbuildinfo
 
 # Logs
 *.log

@@ -43,12 +43,12 @@ async def run_langgraph_stream(
             has_docs=has_docs,
         )
         target_model = decision.model
+        from app.agents.router import MODEL_PROFILES
+        profile = MODEL_PROFILES.get(target_model, {"name": target_model.upper()})
+        profile_name = profile["name"]
 
         # Emit routing status so frontend can show which model was chosen
-        yield f"data: {json.dumps({'step': 'routing', 'status': f'Menggunakan {decision.model.upper()} — {decision.reasoning}', 'provider': target_model})}\n\n"
-
-        # Pause so UI transition is visible (0.8 detik) agar terbaca user
-        await asyncio.sleep(0.8)
+        yield f"data: {json.dumps({'step': 'routing', 'status': f'Menggunakan {profile_name} — {decision.reasoning}', 'provider': target_model})}\n\n"
 
         search_tool = WebSearchTool(api_key=settings.TAVILY_API_KEY)
 
@@ -75,8 +75,8 @@ async def run_langgraph_stream(
             if not should_rag:
                 return None
             try:
-                # Berikan timeout 10 detik agar tidak stuck
-                rag_results = await asyncio.wait_for(document_store.search(prompt, session_id=session_id, top_k=3), timeout=10.0)
+                # Timeout 5 detik - lebih cepat dari sebelumnya (10 detik)
+                rag_results = await asyncio.wait_for(document_store.search(prompt, session_id=session_id, top_k=3), timeout=5.0)
                 if rag_results:
                     ctx = "=== KONTEKS DOKUMEN ===\n"
                     for r in rag_results:
@@ -104,7 +104,7 @@ async def run_langgraph_stream(
             if context_injections:
                 final_prompt = (
                     f"{chr(10).join(context_injections)}\n\n"
-                    f"Berdasarkan informasi di atas (utamakan data terbaru), jawab pertanyaan: {prompt}"
+                    f"Berdasakan informasi di atas (utamakan data terbaru), jawab pertanyaan: {prompt}"
                 )
             else:
                 final_prompt = prompt
@@ -115,44 +115,10 @@ async def run_langgraph_stream(
         yield f"data: {json.dumps({'step': 'answering', 'status': f'Menghubungkan ke {target_model}...', 'provider': target_model})}\n\n"
 
         # ── Generate Streaming Response ──────────────────────────────────────
-        is_reasoning = False
-        accumulated_reasoning = ""
-        last_reasoning_yield = 0
-        stream_start_time = asyncio.get_event_loop().time()
-
+        # Langsung yield content tanpa menampilkan reasoning process
         async for chunk in ai_manager.stream(target_model, final_prompt, history=history, attachments=image_attachments):
             if chunk:
-                # Safety: Check if we have been in reasoning for too long
-                now = asyncio.get_event_loop().time()
-                if is_reasoning and (now - stream_start_time > 45.0):
-                    yield f"data: {json.dumps({'step': 'answering', 'status': 'Hampir selesai berfikir...', 'provider': target_model})}\n\n"
-                    is_reasoning = False
-
-                if chunk.startswith("__REASONING__:"):
-                    # Mode reasoning (Advanced Thinking Models)
-                    content = chunk.replace("__REASONING__:", "")
-                    accumulated_reasoning += content
-                    
-                    # Throttle emission to max 5 times per second to prevent browser choking
-                    if now - last_reasoning_yield > 0.2:
-                        display_text = accumulated_reasoning[-80:].replace("\n", " ").strip()
-                        if len(accumulated_reasoning) > 80:
-                            display_text = f"...{display_text}"
-                            
-                        yield f"data: {json.dumps({'step': 'reasoning', 'status': display_text, 'provider': target_model})}\n\n"
-                        last_reasoning_yield = now
-                    is_reasoning = True
-                else:
-                    # Ganti state dari 'reasoning' ke 'answering' sehingga UI Thinking Box ditutup
-                    if is_reasoning:
-                        yield f"data: {json.dumps({'step': 'answering', 'status': 'Selesai berpikir. Menyusun jawaban...', 'provider': target_model})}\n\n"
-                        is_reasoning = False
-                        
-                    yield f"data: {json.dumps(chunk)}\n\n"
- 
-        # Pastikan kita menutup status reasoning/answering sebelum selesai
-        if is_reasoning:
-             yield f"data: {json.dumps({'step': 'answering', 'status': 'Selesai.', 'provider': target_model})}\n\n"
+                yield f"data: {json.dumps(chunk)}\n\n"
              
         yield f"data: {json.dumps('[DONE]')}\n\n"
 
